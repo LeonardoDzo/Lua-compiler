@@ -15,8 +15,9 @@ namespace Ejemplo1
     {
         static StreamWriter escribir;
 
-      
+
         List<string> letras = new List<string>();
+        List<int> program = new List<int>();
         public CompiladorLua()
         {
             InitializeComponent();
@@ -31,14 +32,15 @@ namespace Ejemplo1
         static bool mu = false;
         public void AnalisisLexico()
         {
+            program.Clear();
             string cadena;
             string[] lineCount = rtxtboxCodigo.Lines;
-            
+           
             listbxTokens.Items.Clear();
             for (int i = 0; i < lineCount.Length; i++)
             {
                 cadena = lineCount[i];
-          
+               
                 if (cadena=="" ) continue ;
                 Lexico lx = new Lexico();
                 
@@ -51,6 +53,9 @@ namespace Ejemplo1
                 lx.AnalisisContenedor();
                 mu = lx.Multi();
                 letras = lx.Lista();
+                program = lx.Program();
+                 if (lineCount.Length == (i + 1)) program.Add(1000); else program.Add(24);
+                
                 
                 foreach (string a in letras)
                 {
@@ -58,6 +63,7 @@ namespace Ejemplo1
                 }
                 
             }
+           
             letras.Clear();
 
         }
@@ -93,6 +99,15 @@ namespace Ejemplo1
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+
+        private void btnCompilar_Click(object sender, EventArgs e)
+        {
+            Sintaxis sx = new Sintaxis();
+            sx.Program = program;
+            
+            sx.chunk();
+            MessageBox.Show(sx.MSG());
         }
 
        
