@@ -17,6 +17,7 @@ namespace Ejemplo1
 
 
         List<string> letras = new List<string>();
+        List<string> Errores = new List<string>();
         List<int> program = new List<int>();
         public CompiladorLua()
         {
@@ -25,6 +26,7 @@ namespace Ejemplo1
         }
 
         private void richTextBox1_KeyUp(object sender, KeyEventArgs e)
+        
         {
             AnalisisLexico();
       
@@ -103,11 +105,16 @@ namespace Ejemplo1
 
         private void btnCompilar_Click(object sender, EventArgs e)
         {
+            lbxErrores.Items.Clear();
             Sintaxis sx = new Sintaxis();
-            sx.Program = program;
-            
+            sx.Program = program; 
             sx.chunk();
-            MessageBox.Show(sx.MSG());
+            Errores = sx.Errores();
+            foreach (var item in Errores)
+            {
+                lbxErrores.Items.Add(item);
+            }
+            MessageBox.Show("Compilacin terminada");
         }
 
        

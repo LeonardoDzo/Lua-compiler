@@ -40,6 +40,7 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
             this.btnCompilar = new System.Windows.Forms.Button();
+            this.lbxErrores = new System.Windows.Forms.ListBox();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -52,11 +53,10 @@
             // 
             this.rtxtboxCodigo.BackColor = System.Drawing.Color.DimGray;
             this.rtxtboxCodigo.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.rtxtboxCodigo.Dock = System.Windows.Forms.DockStyle.Fill;
             this.rtxtboxCodigo.ForeColor = System.Drawing.Color.White;
             this.rtxtboxCodigo.Location = new System.Drawing.Point(0, 24);
             this.rtxtboxCodigo.Name = "rtxtboxCodigo";
-            this.rtxtboxCodigo.Size = new System.Drawing.Size(1093, 455);
+            this.rtxtboxCodigo.Size = new System.Drawing.Size(907, 335);
             this.rtxtboxCodigo.TabIndex = 2;
             this.rtxtboxCodigo.Text = "";
             this.rtxtboxCodigo.KeyUp += new System.Windows.Forms.KeyEventHandler(this.richTextBox1_KeyUp);
@@ -65,12 +65,11 @@
             // 
             this.listbxTokens.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.listbxTokens.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.listbxTokens.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.listbxTokens.ForeColor = System.Drawing.Color.White;
             this.listbxTokens.FormattingEnabled = true;
-            this.listbxTokens.Location = new System.Drawing.Point(0, 360);
+            this.listbxTokens.Location = new System.Drawing.Point(913, 25);
             this.listbxTokens.Name = "listbxTokens";
-            this.listbxTokens.Size = new System.Drawing.Size(1093, 119);
+            this.listbxTokens.Size = new System.Drawing.Size(168, 444);
             this.listbxTokens.TabIndex = 4;
             // 
             // menuStrip1
@@ -152,12 +151,21 @@
             this.btnCompilar.UseVisualStyleBackColor = true;
             this.btnCompilar.Click += new System.EventHandler(this.btnCompilar_Click);
             // 
+            // lbxErrores
+            // 
+            this.lbxErrores.FormattingEnabled = true;
+            this.lbxErrores.Location = new System.Drawing.Point(0, 365);
+            this.lbxErrores.Name = "lbxErrores";
+            this.lbxErrores.Size = new System.Drawing.Size(907, 108);
+            this.lbxErrores.TabIndex = 8;
+            // 
             // CompiladorLua
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.ClientSize = new System.Drawing.Size(1093, 479);
+            this.Controls.Add(this.lbxErrores);
             this.Controls.Add(this.btnCompilar);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.listbxTokens);
@@ -191,6 +199,7 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btnCompilar;
+        private System.Windows.Forms.ListBox lbxErrores;
     }
 }
 
