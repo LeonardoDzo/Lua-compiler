@@ -269,21 +269,7 @@ namespace Ejemplo1
         {
             return program;
         }
-        //public void espaciosenblanco()
-        //{
-        //    string aux = "";
-        //    contenedor = cadena.ToCharArray();
-        //    for (int i = 0; i < contenedor.Length-1; i++)
-        //    {
-        //        bool encuentra = false;
-        //        if (encuentra || char.IsWhiteSpace(contenedor[i])==false)
-        //        {
-        //            aux += contenedor[i];
-        //            encuentra = true;
-        //        }
-        //    }
-        //    cadena = aux;
-        //}
+
         public bool Multi()
         {
             return multi;

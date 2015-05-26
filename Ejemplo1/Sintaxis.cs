@@ -9,234 +9,276 @@ namespace Ejemplo1
     class Sintaxis
     {
         static List<int> program = new List<int>();
-        static List<string> errores = new List<string>();
-        static int[] expre = new int[]  {101,103,206,210,215};
-        static int[] opBinario = new int[] {104,108,109,110,116,117,118,119,122,201,212};
-        static int bdo = 0;
-        static int bfor = 0;
-        static int bif = 0;
-        static string msg;
-        
-        static int pos = 0;
-        static bool go= false;
 
-        public Sintaxis() {
-            pos = 0;
-        }
         public List<int> Program
         {
-            get { return program; }
-            set { program = value; }
+            get { return Sintaxis.program; }
+            set { Sintaxis.program = value; }
         }
+        static List<string> errores = new List<string>();
+
         public List<string> Errores()
         {
             return errores;
         }
-        public void chunk()
-        {
-            stat();
-        }
-        public static void block()
-        {
-            stat();
-        }
-        public static void stat()
-        {
-            while (pos < program.Count && program[pos] < 1000)
-            {
-                if (program[pos] == 24) pos++;
+        static int[] expre = new int[]  {101,103,206,210,215};
+        static int[] opBinario = new int[] {104,108,109,110,116,117,118,119,122,201,212};
+        static string msg;
+        
+        static int p= 0;
+        static bool go= false;
 
-                switch(program[pos]){
-                    case 102:
-                        varlist();
-                        if (program[pos] == 120)
+        public void inicializa()
+        {
+            p = 0;
+            for (int i = 0; i < program.Count; i++)
+            {
+                
+                sentencia();
+                i = p;
+                
+            }
+        }
+        private void chunk()
+        {
+            sentencia();
+        }
+        private void bloque()
+        {
+            chunk();
+        }
+ 
+ 
+        public void sentencia(){
+
+
+            if (p < program.Count)
+            {
+                if (esIf(program[p]))
+                {
+                    p++;
+                    bloqueif();
+
+                }
+                else if (esWhile(program[p]))
+                {
+
+                }
+                else if (esIden(program[p]))
+                {
+                    if (varList())
+                    {
+                        if (esIgual(program[p]))
                         {
-                            pos++;
-                            explist();         
-                            pos++;
+                            p++;
+                            Metodoexp();
                         }
                         else
                         {
-                            errores.Add("Error Sintaxis: Se esperaba un  \"=\"");
+                            errores.Add("Se esperaba un igual");
                         }
-                        break;
-                    case 203:
-                        pos++;
-                        if (program[pos] == 24) pos++;
-                        bdo++;
-                        block();
-                        break;
-                    case 207:
-                        break;
-                    case 208:
-                        break;
-                    default:
-                        while (bdo > 0)
-                        {
-                            if (program[pos] == 205)
-                            {
-                                bdo--;
-                                if (program[pos] == 24) pos++;
-                                pos++;
-                            }
-                            else
-                            {
-                                errores.Add("Error de sintaxis: Se esperaba la palabra reservada end");
-                                break;
-                            }
-                        }
-                        break;
-
-                }
-                
-            }
-            
-        }
-
-        public static void varlist()
-        {
-            var();
-            while (program[pos] == 125)
-            {
-                var();
-            }
-        }
-        public static void var()
-        {
-            
-            if (program[pos] == 102)
-            {
-                pos++;
-                if (program[pos] == 114)
-                {
-                    exp();
-                    if (program[pos] == 115)
-                    {
-                        pos++;
-                        go = true;
                     }
                     else
                     {
-                        errores.Add("Error Sintaxis: Falta un ]");
+                        errores.Add("Se esperaba un identificador");
                     }
+
+
+
                 }
                 else
                 {
-                    prefiexp();
+                    errores.Add("Error de sintaxis");
                 }
-                
-                go = true;
+
             }
             
-        }
-        public static void explist(){
-            exp();
-            
-            while (pos < program.Count && program[pos] == 125)
-            {
-                exp();
-            }
-        }
-        public static void exp()
-        {
-            for (int i = 0; i < expre.Length; i++)
-            {
-                if (expre[i] == program[pos])
-                {
-                    pos++;
-                    for (int j = 0; j < opBinario.Length; j++)
-                    {
-                        if (pos >= program.Count) break;
-                        if (program[pos] == opBinario[j])
-                        {
-                            pos++;
-                            exp();
-                        }
-                    }
-                    
-                    go = true;
-                    break;
-                }
-                else
-                {
-                    errores.Add("Error de Sintaxis se esperaba una Expresión");
-                    go = false;
-                }
-            }
         }
 
-        public static void prefiexp()
+        private bool esComa(int token)
         {
-            if (program[pos] == 102)
+            if (token == 125)
             {
-                var();
+                return true;
             }
-            else
-            {
-                if (program[pos] == 114)
-                {
-                    exp();
-                    if (program[pos] == 115)
-                    {
-                        pos++;
-                        go = true;
-                    }
-                }
-            }
+            return false;
+            
+        } 
+        
+       
+   
+
+    private bool esIf(int token){
+        if (token == 208)
+        {
+            return true;
         }
-        public static void ConstructorTabla()
+        return false;
+    }
+    
+    private bool esThen(int token){
+        if (token == 214){
+            return true;
+        }
+        return false;
+    }
+    private bool esEnd(int token)
+    {
+        if (token == 205)
         {
-            if (program[pos] == 114)
+            return true;
+        }
+        return false;
+    }
+        
+    private bool esWhile(int token){
+        if (token == 211){
+            return true;
+        }
+        return false;
+    }
+    
+    private bool esIden(int token){
+        if (token == 102) {
+            return true;
+        }
+        return false;
+    }
+    private bool esIgual(int token){
+        if (token == 120) {
+            return true;
+          
+        }
+        return false;
+    }
+
+    public bool varList()
+    {
+            if (esIden(program[p]))
             {
-                pos++;
-                if (program[pos] == 115)
+                p++;
+                if (esComa(program[p]))
                 {
-                    go = true;
+                    p++;
+                    varList();
                 }
                 else
                 {
-                    listadeCampos();
-                    ConstructorTabla();
+                    return true;
                 }
-            }
-        }
-        public static void listadeCampos(){
-            campo();
-            if (program[pos] == 107 || program[pos] == 125)
-            {
-                pos++;
-                campo();
-            }
-        }
-        public static void campo()
-        {
-            
-            if (program[pos] == 102)
-            {
-                pos++;
-                if (program[pos] == 120)
-                {
-                    pos++;
-                    exp();
-                }
-               
-            }
-            if (program[pos] == 123)
-            {
-                exp();
-                if (program[pos] == 124)
-                {
-                    go = true;
-                }
+                
             }
             else
             {
-                exp();
+                return false ;
             }
-            
+           
+          
+               
+         
+            return true;
+
+     
+    }
+
+
+    private bool bloqueif(){
+        if (Metodoexp())
+        {
+            if (esThen(program[p]))
+            {
+                p+=1;
+                bloque();
+                if (p< program.Count && esEnd(program[p]))
+                {
+                    p++;
+                }
+                else
+                {
+                    errores.Add("Se esperaba un end");
+                }
+                 
+                
+            }else
+            {
+                errores.Add("Se esperaba la palabra reservada Then"); 
+            }
         }
+        else
+        {
+            return false;
+        }
+
         
-      
+        return true;
+    }
+   
+                 
+    private bool Metodoexp(){
+        if (p< program.Count && exp(program[p]))
+        {
+            p+=1;
+            if (p < program.Count && operadorBin(program[p]))
+            {
+                p+=1;
+                Metodoexp();
+            }else{
+                return true;
+            }
+        }
+        else
+        {
+            errores.Add("Falta una expresion");
+            return false;
+        }
+        return true;
         
     }
+
+    private bool exp(int token){
+        switch (token)
+        {
+            case 215:
+                return true;
+            case 206:
+                return true;
+            case 101:
+                return true;
+            case 102:
+                return true;
+            case 103:
+                return true;
+            default:
+                return false;
+        }
+    }
+    private bool operadorBin(int token){
+        switch(token){
+            case 108:
+                return true;
+            case 109:
+                return true;
+            case 104:
+                return true;
+            case 116:
+                return true;
+            case 118:
+                return true;
+            case 112:
+                return true;
+            case 117:
+                return true;
+            case 119:
+                return true;
+            case 120:
+                return true;
+            case 121:
+                return true;
+            case 122:
+                return true;  
+            default:
+                return false;      
+        }
+    }
+}
 }

@@ -56,7 +56,7 @@ namespace Ejemplo1
                 mu = lx.Multi();
                 letras = lx.Lista();
                 program = lx.Program();
-                 if (lineCount.Length == (i + 1)) program.Add(1000); else program.Add(24);
+                 
                 
                 
                 foreach (string a in letras)
@@ -106,10 +106,13 @@ namespace Ejemplo1
         private void btnCompilar_Click(object sender, EventArgs e)
         {
             lbxErrores.Items.Clear();
+            Errores.Clear();
             Sintaxis sx = new Sintaxis();
-            sx.Program = program; 
-            sx.chunk();
+            sx.Program = program;
+            sx.inicializa();
+           
             Errores = sx.Errores();
+            
             foreach (var item in Errores)
             {
                 lbxErrores.Items.Add(item);
