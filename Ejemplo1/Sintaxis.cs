@@ -9,33 +9,31 @@ namespace Ejemplo1
     class Sintaxis
     {
         static List<int> program = new List<int>();
-
+        static int i = 1;
         public List<int> Program
         {
             get { return Sintaxis.program; }
             set { Sintaxis.program = value; }
         }
         static List<string> errores = new List<string>();
+       
 
         public List<string> Errores()
         {
             return errores;
         }
-        static int[] expre = new int[]  {101,103,206,210,215};
-        static int[] opBinario = new int[] {104,108,109,110,116,117,118,119,122,201,212};
-        static string msg;
-        
+
         static int p= 0;
-        static bool go= false;
+        
 
         public void inicializa()
         {
             p = 0;
-            for (int i = 0; i < program.Count; i++)
+            while (p < program.Count)
             {
                 
                 sentencia();
-                i = p;
+               
                 
             }
         }
@@ -57,44 +55,230 @@ namespace Ejemplo1
                 if (esIf(program[p]))
                 {
                     p++;
-                    bloqueif();
-
-                }
-                else if (esWhile(program[p]))
-                {
-
-                }
-                else if (esIden(program[p]))
-                {
-                    if (varList())
+                   
+                    if (Metodoexp())
                     {
-                        if (esIgual(program[p]))
+                        if (esThen(program[p]))
                         {
+
                             p++;
-                            Metodoexp();
+                            
+                            if (p < program.Count && esElse(program[p]))
+                            {
+                                p++;
+                                
+                            }
+                            if (p < program.Count && esEnd(program[p]))
+                            {
+                                program.RemoveAt(p);
+
+                            }
+                            else
+                            {
+                                
+                                bloque();
+                                if (p < program.Count && esElse(program[p]))
+                                {
+                                    p++;
+                                   
+                                }
+                                int aux = p;
+                                while (p <= program.Count)
+                                {
+                                    if (p < program.Count && esEnd(program[p]))
+                                    {
+                                        program.RemoveAt(p);
+                                        break;
+                                    }
+                                    else 
+                                    {
+                                        
+                                        if (p == program.Count)
+                                        {
+                                            errores.Add("Se esperaba un End");
+                                            break;
+                                        }
+                                    }
+                                    p++;
+                                    
+                                }
+                                p = aux;
+
+                            }
+                           
+                            
                         }
                         else
                         {
-                            errores.Add("Se esperaba un igual");
+                            errores.Add("Se esperaba la palabra reservada Then");
+                            
+                        }
+                    }
+                    
+
+                }
+                else if (esFor(program[p]))
+                {
+                     p++;
+                     
+                     if (esIden(program[p]))
+                     {
+                         p++;
+                       
+                         if (esIgual(program[p]))
+                         {
+                             p++;
+                            
+                             Metodoexp();
+                             if (esComa(program[p]))
+                             {
+                                 p++;
+                               
+                                 Metodoexp();
+                                 if (esDo(program[p]))
+                                 {
+                                     p++;
+                                     
+                                     
+                                     
+                                     if (p < program.Count && esEnd(program[p]))
+                                     {
+                                         program.RemoveAt(p);
+
+                                     }
+                                     else
+                                     {
+                                         bloque();
+                                         int aux = p;
+                                         while (p <= program.Count)
+                                         {
+                                             if (p < program.Count && esEnd(program[p]))
+                                             {
+                                                 program.RemoveAt(p);
+                                                 break;
+                                             }
+                                             else
+                                             {
+                                                 if (p == program.Count)
+                                                 {
+                                                     errores.Add("Se esperaba un end");
+                                                     break;
+                                                 }
+                                             }
+                                             p++;
+
+                                         }
+                                         p = aux;
+
+                                     }
+                                     
+                                     }
+                                     else
+                                     {
+                                         errores.Add("Se esperaba la palabra reservada do");
+
+                                     }
+
+                                 }
+
+                         }
+                         else
+                         {
+                             errores.Add("Se esperaba un =");
+                         }
+
+                     }
+                     else
+                     {
+                         errores.Add("No se declara el identificador");
+                     }
+                }
+                else if (esIden(program[p]))
+                {
+                        p++;
+                        if (varList())
+                        {
+
+                            if (p < program.Count && esIgual(program[p]))
+                            {
+                                p++;
+                                Metodoexp();
+
+                            }
+                            else
+                            {
+                                errores.Add("Se esperaba un igual");
+                            }
+                        }
+                        else {
+                            errores.Add("Se esperaba un Identificador");
+
+                        }
+
+                   
+
+
+
+                }
+                else if (esPrint(program[p]))
+                {
+                    p++;
+                    if (espaIzq(program[p]))
+                    {
+                        do
+                        {
+                            p++;
+                           
+                            Metodoexp();
+
+                        } while (esComa(program[p]));
+                        if (p<program[p] && espaDer(program[p]))
+                        {
+                            p++;
+                            
+                        }
+                        else
+                        {
+                            errores.Add("Se esperaba un parentesis");
                         }
                     }
                     else
                     {
-                        errores.Add("Se esperaba un identificador");
+                        errores.Add("Se esperaba un parentesis");
                     }
-
-
 
                 }
                 else
                 {
-                    errores.Add("Error de sintaxis");
+                  
+                    p++;
+                 
                 }
 
+
             }
+           
             
         }
 
+        private bool esPrint(int token)
+        {
+            if (token == 216)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private bool esElse(int token)
+        {
+            if (token == 204)
+            {
+                return true;
+            }
+            return false;
+        }
+        
         private bool esComa(int token)
         {
             if (token == 125)
@@ -103,21 +287,95 @@ namespace Ejemplo1
             }
             return false;
             
-        } 
-        
-       
-   
+        }
+        private bool esDo(int token)
+        {
+            if (token == 203)
+            {
+                return true;
+            }
+            return false;
 
-    private bool esIf(int token){
+        }
+        private bool espaDer(int token)
+        {
+            if (token == 115)
+            {
+                return true;
+            }
+            return false;
+
+        }
+        private bool espaIzq(int token)
+        {
+            if (token == 114)
+            {
+                return true;
+            }
+            return false;
+        }
+    public bool varList()
+    {
+        bool h=true;
+        while (p < program.Count && esComa(program[p]))
+        {
+            p++;
+            if (p< program.Count && esIden(program[p]))
+            {
+                h = true;
+                p++;
+            }
+            else
+            {
+                h = false;
+                break;
+            }
+
+
+        } 
+
+        return h;
+            
+            
+    }
+              
+    private bool Metodoexp(){
+        if (p< program.Count && exp(program[p]))
+        {
+            p++;
+           
+            if (p < program.Count && operadorBin(program[p]))
+            {
+                p++;
+                
+                Metodoexp();
+
+            }else{
+                
+                return true;
+            }
+        }
+        else
+        {
+            errores.Add("Falta una expresion");
+            return false;
+        }
+        return true;
+        
+    }
+    private bool esIf(int token)
+    {
         if (token == 208)
         {
             return true;
         }
         return false;
     }
-    
-    private bool esThen(int token){
-        if (token == 214){
+
+    private bool esThen(int token)
+    {
+        if (token == 214)
+        {
             return true;
         }
         return false;
@@ -130,111 +388,33 @@ namespace Ejemplo1
         }
         return false;
     }
-        
-    private bool esWhile(int token){
-        if (token == 211){
-            return true;
-        }
-        return false;
-    }
-    
-    private bool esIden(int token){
-        if (token == 102) {
-            return true;
-        }
-        return false;
-    }
-    private bool esIgual(int token){
-        if (token == 120) {
-            return true;
-          
-        }
-        return false;
-    }
 
-    public bool varList()
+    private bool esFor(int token)
     {
-            if (esIden(program[p]))
-            {
-                p++;
-                if (esComa(program[p]))
-                {
-                    p++;
-                    varList();
-                }
-                else
-                {
-                    return true;
-                }
-                
-            }
-            else
-            {
-                return false ;
-            }
-           
-          
-               
-         
+        if (token == 207)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    private bool esIden(int token)
+    {
+        if (token == 102)
+        {
+            return true;
+        }
+        return false;
+    }
+    private bool esIgual(int token)
+    {
+        if (token == 120)
+        {
             return true;
 
-     
+        }
+        return false;
     }
-
-
-    private bool bloqueif(){
-        if (Metodoexp())
-        {
-            if (esThen(program[p]))
-            {
-                p+=1;
-                bloque();
-                if (p< program.Count && esEnd(program[p]))
-                {
-                    p++;
-                }
-                else
-                {
-                    errores.Add("Se esperaba un end");
-                }
-                 
-                
-            }else
-            {
-                errores.Add("Se esperaba la palabra reservada Then"); 
-            }
-        }
-        else
-        {
-            return false;
-        }
-
-        
-        return true;
-    }
-   
-                 
-    private bool Metodoexp(){
-        if (p< program.Count && exp(program[p]))
-        {
-            p+=1;
-            if (p < program.Count && operadorBin(program[p]))
-            {
-                p+=1;
-                Metodoexp();
-            }else{
-                return true;
-            }
-        }
-        else
-        {
-            errores.Add("Falta una expresion");
-            return false;
-        }
-        return true;
-        
-    }
-
     private bool exp(int token){
         switch (token)
         {

@@ -153,6 +153,7 @@
             // 
             // lbxErrores
             // 
+            this.lbxErrores.BackColor = System.Drawing.SystemColors.InactiveCaption;
             this.lbxErrores.FormattingEnabled = true;
             this.lbxErrores.Location = new System.Drawing.Point(0, 365);
             this.lbxErrores.Name = "lbxErrores";

@@ -15,13 +15,15 @@ namespace Ejemplo1
     {
         static StreamWriter escribir;
 
-
+        static string[] palReservadas = new string[] { "and", "break", "do", "else", "end", "false", "for", "if", "in", "nil", "not", "or", "return", "then", "true" };
         List<string> letras = new List<string>();
         List<string> Errores = new List<string>();
         List<int> program = new List<int>();
+        
         public CompiladorLua()
         {
             InitializeComponent();
+
             
         }
 
@@ -29,6 +31,7 @@ namespace Ejemplo1
         
         {
             AnalisisLexico();
+            ColorTxt();
       
         }
         static bool mu = false;
@@ -56,6 +59,7 @@ namespace Ejemplo1
                 mu = lx.Multi();
                 letras = lx.Lista();
                 program = lx.Program();
+                //if ((i + 1) < lineCount.Length) program.Add(24);
                  
                 
                 
@@ -65,16 +69,43 @@ namespace Ejemplo1
                 }
                 
             }
-           
+            //this.rtxtboxCodigo.TextChanged += (ob, ev) =>
+            //{
+            //    var palabras = this.rtxtboxCodigo.Text.Split(new char[] { ' ' },
+            //    StringSplitOptions.RemoveEmptyEntries);
+            //    var resultado = from b in palReservadas
+            //                    from c in palabras
+
+            //                    where c == b
+            //                    select b;
+
+            //    int inicio = 0;
+            //    foreach (var item in resultado)
+            //    {
+            //        inicio = this.rtxtboxCodigo.Text.IndexOf(item, inicio);
+            //        this.rtxtboxCodigo.Select(inicio, item.Length);
+            //        this.rtxtboxCodigo.SelectionColor = Color.Aquamarine;
+            //        this.rtxtboxCodigo.SelectionStart = this.rtxtboxCodigo.Text.Length;
+            //        inicio++;
+            //    }
+
+            //    this.rtxtboxCodigo.SelectionColor = Color.White;
+            //    this.rtxtboxCodigo.SelectionStart = this.rtxtboxCodigo.Text.Length;
+
+            //};
             letras.Clear();
-
+            
         }
-
+        private void ColorTxt()
+        {
+          
+        }
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 rtxtboxCodigo.Text = File.ReadAllText(openFileDialog1.FileName);
+                ColorTxt();
             }
             AnalisisLexico();
             
@@ -89,6 +120,7 @@ namespace Ejemplo1
                     escribir = new StreamWriter(saveFileDialog1.FileName);
                     escribir.Write(rtxtboxCodigo.Text);
                     escribir.Close();
+                   
                     
                 }
             }

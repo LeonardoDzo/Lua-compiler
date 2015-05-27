@@ -43,7 +43,7 @@ namespace Ejemplo1
             //espaciosenblanco();
            
         }
-        static string[] palReservadas = new string[] { "and", "break", "do", "else", "end", "false", "for", "if", "in", "nil", "not", "or", "return", "then","true" };
+        static string[] palReservadas = new string[] { "and", "break", "do", "else", "end", "false", "for", "if", "in", "nil", "not", "or", "return", "then","true","Print"};
         static string[] Errores = new string[] { "Caracter invalido", "Numero mal escrito", "Falta un igual", "Falta una comilla" };
 
         static int[,] MatrizT = new int[,] {      /*  d	       L	  _       "	      '       -   	  .  	  ;  	 +	     *	     %   	 {   	 }	     (	     )	    <	      >     =	     ~	     [   	]	  Demas, WitheSpace,       ,,   Enter*/
