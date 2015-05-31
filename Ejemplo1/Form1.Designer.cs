@@ -159,6 +159,7 @@
             this.lbxErrores.Name = "lbxErrores";
             this.lbxErrores.Size = new System.Drawing.Size(907, 108);
             this.lbxErrores.TabIndex = 8;
+            this.lbxErrores.SelectedIndexChanged += new System.EventHandler(this.lbxErrores_SelectedIndexChanged);
             // 
             // CompiladorLua
             // 

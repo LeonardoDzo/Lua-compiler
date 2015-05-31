@@ -18,6 +18,7 @@ namespace Ejemplo1
         static string[] palReservadas = new string[] { "and", "break", "do", "else", "end", "false", "for", "if", "in", "nil", "not", "or", "return", "then", "true" };
         List<string> letras = new List<string>();
         List<string> Errores = new List<string>();
+        List<int> lineas = new List<int>();
         List<int> program = new List<int>();
         
         public CompiladorLua()
@@ -30,6 +31,7 @@ namespace Ejemplo1
         private void richTextBox1_KeyUp(object sender, KeyEventArgs e)
         
         {
+            
             AnalisisLexico();
             ColorTxt();
       
@@ -45,8 +47,8 @@ namespace Ejemplo1
             for (int i = 0; i < lineCount.Length; i++)
             {
                 cadena = lineCount[i];
-               
-                if (cadena=="" ) continue ;
+
+                if (cadena == "") { program.Add(24); continue; }
                 Lexico lx = new Lexico();
                 
                 lx.Cadena = cadena;
@@ -59,7 +61,7 @@ namespace Ejemplo1
                 mu = lx.Multi();
                 letras = lx.Lista();
                 program = lx.Program();
-                //if ((i + 1) < lineCount.Length) program.Add(24);
+                program.Add(24);
                  
                 
                 
@@ -144,12 +146,39 @@ namespace Ejemplo1
             sx.inicializa();
            
             Errores = sx.Errores();
-            
+            lineas = sx.Lineas();
             foreach (var item in Errores)
             {
                 lbxErrores.Items.Add(item);
             }
             MessageBox.Show("Compilacin terminada");
+        }
+
+        private void lbxErrores_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (lbxErrores.Focus())
+            {
+                int i = 0;
+                i = lbxErrores.SelectedIndex;
+
+               
+                //int position = this.rtxtboxCodigo.GetCharIndexFromPosition(p);
+
+                //int Linea = this.rtxtboxCodigo.GetLineFromCharIndex(position);
+                int start = this.rtxtboxCodigo.GetFirstCharIndexFromLine(lineas[i]);
+
+                int end = this.rtxtboxCodigo.Lines[(lineas[i] - 1)].Length;
+                this.rtxtboxCodigo.Select(Math.Abs(lineas[i]), end + 1);
+                this.rtxtboxCodigo.SelectionBackColor = Color.Blue;
+            }
+            else
+            {
+                rtxtboxCodigo.ClearUndo();
+            }
+            
+            
+            
+
         }
 
        

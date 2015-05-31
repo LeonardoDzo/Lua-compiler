@@ -8,6 +8,7 @@ namespace Ejemplo1
 {
     class Sintaxis
     {
+        static List<int> lineas = new List<int>();
         static List<int> program = new List<int>();
         static int i = 1;
         public List<int> Program
@@ -22,6 +23,11 @@ namespace Ejemplo1
         {
             return errores;
         }
+        public List<int> Lineas()
+        {
+            return lineas;
+        }
+
 
         static int p= 0;
         
@@ -29,12 +35,10 @@ namespace Ejemplo1
         public void inicializa()
         {
             p = 0;
+            i = 1;
             while (p < program.Count)
-            {
-                
+            { 
                 sentencia();
-               
-                
             }
         }
         private void chunk()
@@ -49,7 +53,7 @@ namespace Ejemplo1
  
         public void sentencia(){
 
-
+            while (p < program.Count && program[p] == 24) { i++; p++; }
             if (p < program.Count)
             {
                 if (esIf(program[p]))
@@ -62,11 +66,11 @@ namespace Ejemplo1
                         {
 
                             p++;
-                            
+                            if (p < program.Count && program[p] == 24) { i++; p++; }
                             if (p < program.Count && esElse(program[p]))
                             {
                                 p++;
-                                
+                                if (p < program.Count && program[p] == 24) { i++; p++; }
                             }
                             if (p < program.Count && esEnd(program[p]))
                             {
@@ -80,7 +84,7 @@ namespace Ejemplo1
                                 if (p < program.Count && esElse(program[p]))
                                 {
                                     p++;
-                                   
+                                    if (p < program.Count && program[p] == 24) { i++; p++; }
                                 }
                                 int aux = p;
                                 while (p <= program.Count)
@@ -95,11 +99,13 @@ namespace Ejemplo1
                                         
                                         if (p == program.Count)
                                         {
-                                            errores.Add("Se esperaba un End");
+                                            errores.Add("Se esperaba un End en la linea " + i);
+                                            lineas.Add(i);
                                             break;
                                         }
                                     }
                                     p++;
+                                    if (p < program.Count && program[p] == 24) { i++; p++; }
                                     
                                 }
                                 p = aux;
@@ -110,7 +116,8 @@ namespace Ejemplo1
                         }
                         else
                         {
-                            errores.Add("Se esperaba la palabra reservada Then");
+                            errores.Add("Se esperaba la palabra reservada Then en la linea " + i);
+                            lineas.Add(i);
                             
                         }
                     }
@@ -120,11 +127,11 @@ namespace Ejemplo1
                 else if (esFor(program[p]))
                 {
                      p++;
-                     
+                  
                      if (esIden(program[p]))
                      {
                          p++;
-                       
+                        
                          if (esIgual(program[p]))
                          {
                              p++;
@@ -133,14 +140,12 @@ namespace Ejemplo1
                              if (esComa(program[p]))
                              {
                                  p++;
-                               
+                                 
                                  Metodoexp();
                                  if (esDo(program[p]))
                                  {
                                      p++;
-                                     
-                                     
-                                     
+                                     if (p < program.Count && program[p] == 24) { i++; p++; }
                                      if (p < program.Count && esEnd(program[p]))
                                      {
                                          program.RemoveAt(p);
@@ -161,11 +166,13 @@ namespace Ejemplo1
                                              {
                                                  if (p == program.Count)
                                                  {
-                                                     errores.Add("Se esperaba un end");
+                                                     errores.Add("Se esperaba un end en la linea " + i);
+                                                     lineas.Add(i);
                                                      break;
                                                  }
                                              }
                                              p++;
+                                             if (p < program.Count && program[p] == 24) { i++; p++; }
 
                                          }
                                          p = aux;
@@ -175,7 +182,8 @@ namespace Ejemplo1
                                      }
                                      else
                                      {
-                                         errores.Add("Se esperaba la palabra reservada do");
+                                         errores.Add("Se esperaba la palabra reservada do en la linea " + i);
+                                         lineas.Add(i);
 
                                      }
 
@@ -184,13 +192,15 @@ namespace Ejemplo1
                          }
                          else
                          {
-                             errores.Add("Se esperaba un =");
+                             errores.Add("Se esperaba un = en la linea " + i);
+                             lineas.Add(i);
                          }
 
                      }
                      else
                      {
-                         errores.Add("No se declara el identificador");
+                         errores.Add("No se declara el identificador en la linea " + i);
+                         lineas.Add(i);
                      }
                 }
                 else if (esIden(program[p]))
@@ -207,11 +217,13 @@ namespace Ejemplo1
                             }
                             else
                             {
-                                errores.Add("Se esperaba un igual");
+                                errores.Add("Se esperaba un igual en la linea " + i);
+                                lineas.Add(i);
                             }
                         }
                         else {
-                            errores.Add("Se esperaba un Identificador");
+                            errores.Add("Se esperaba un Identificador en la linea " + i);
+                            lineas.Add(i);
 
                         }
 
@@ -239,24 +251,28 @@ namespace Ejemplo1
                         }
                         else
                         {
-                            errores.Add("Se esperaba un parentesis");
+                            errores.Add("Se esperaba un parentesis en la linea " + i);
+                            lineas.Add(i);
                         }
                     }
                     else
                     {
-                        errores.Add("Se esperaba un parentesis");
+                        errores.Add("Se esperaba un parentesis en la linea " + i);
+                        lineas.Add(i);
                     }
 
                 }
                 else
                 {
-                  
+                    errores.Add("Error de sintaxis en la linea " + i);
+                    lineas.Add(i);
                     p++;
                  
                 }
 
 
             }
+            
            
             
         }
@@ -343,7 +359,7 @@ namespace Ejemplo1
         if (p< program.Count && exp(program[p]))
         {
             p++;
-           
+            if (p < program.Count && program[p] == 24) { i++; p++; }
             if (p < program.Count && operadorBin(program[p]))
             {
                 p++;
@@ -357,7 +373,8 @@ namespace Ejemplo1
         }
         else
         {
-            errores.Add("Falta una expresion");
+            errores.Add("Falta una expresion en la linea " + i);
+            lineas.Add(i);
             return false;
         }
         return true;
@@ -440,6 +457,8 @@ namespace Ejemplo1
                 return true;
             case 104:
                 return true;
+            case 105:
+                return true;
             case 116:
                 return true;
             case 118:
@@ -455,6 +474,10 @@ namespace Ejemplo1
             case 121:
                 return true;
             case 122:
+                return true;
+            case 201:
+                return true;
+            case 211:
                 return true;  
             default:
                 return false;      
