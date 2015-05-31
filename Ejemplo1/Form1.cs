@@ -140,6 +140,7 @@ namespace Ejemplo1
         private void btnCompilar_Click(object sender, EventArgs e)
         {
             lbxErrores.Items.Clear();
+            AnalisisLexico();
             Errores.Clear();
             Sintaxis sx = new Sintaxis();
             sx.Program = program;

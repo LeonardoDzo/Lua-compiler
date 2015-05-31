@@ -10,6 +10,7 @@ namespace Ejemplo1
     {
         static List<int> lineas = new List<int>();
         static List<int> program = new List<int>();
+    
         static int i = 1;
         public List<int> Program
         {
@@ -81,6 +82,7 @@ namespace Ejemplo1
                             {
                                 
                                 bloque();
+                                if (p < program.Count && program[p] == 24) { i++; p++; }
                                 if (p < program.Count && esElse(program[p]))
                                 {
                                     p++;
@@ -172,10 +174,11 @@ namespace Ejemplo1
                                                  }
                                              }
                                              p++;
-                                             if (p < program.Count && program[p] == 24) { i++; p++; }
+                                             
 
                                          }
                                          p = aux;
+                                         if (p < program.Count && program[p] == 24) { i++; p++; }
 
                                      }
                                      
@@ -277,59 +280,7 @@ namespace Ejemplo1
             
         }
 
-        private bool esPrint(int token)
-        {
-            if (token == 216)
-            {
-                return true;
-            }
-            return false;
-        }
-
-        private bool esElse(int token)
-        {
-            if (token == 204)
-            {
-                return true;
-            }
-            return false;
-        }
-        
-        private bool esComa(int token)
-        {
-            if (token == 125)
-            {
-                return true;
-            }
-            return false;
-            
-        }
-        private bool esDo(int token)
-        {
-            if (token == 203)
-            {
-                return true;
-            }
-            return false;
-
-        }
-        private bool espaDer(int token)
-        {
-            if (token == 115)
-            {
-                return true;
-            }
-            return false;
-
-        }
-        private bool espaIzq(int token)
-        {
-            if (token == 114)
-            {
-                return true;
-            }
-            return false;
-        }
+    
     public bool varList()
     {
         bool h=true;
@@ -356,29 +307,124 @@ namespace Ejemplo1
     }
               
     private bool Metodoexp(){
-        if (p< program.Count && exp(program[p]))
+       
+            
+         if (p < program.Count && (exp(program[p]) || esIden(program[p]) || espaIzq(program[p])))
         {
-            p++;
-            if (p < program.Count && program[p] == 24) { i++; p++; }
-            if (p < program.Count && operadorBin(program[p]))
-            {
-                p++;
-                
-                Metodoexp();
+                if (espaIzq(program[p]))
+                {
+                    prefiexp();
+                }
+                else
+                {
+                    p++;
+                }
+               
+                if (p < program.Count && operadorBin(program[p]))
+                {
+                    p++;
+                    Metodoexp();
 
-            }else{
-                
-                return true;
-            }
+                }
+                else
+                {
+
+                    return true;
+                }
+       
         }
         else
         {
-            errores.Add("Falta una expresion en la linea " + i);
-            lineas.Add(i);
+                errores.Add("Falta una expresion en la linea " + i);
+                lineas.Add(i);
+                if (p < program.Count && program[p] == 24) { i++; p++; }
+         
             return false;
         }
         return true;
         
+    }
+ 
+    private void prefiexp(){
+      
+            p++;
+            Metodoexp();
+            int aux = p;
+            while (p <= program.Count)
+            {
+                if (p < program.Count && espaDer(program[p]))
+                {
+                    program.RemoveAt(p);
+                    break;
+                }
+                else
+                {
+
+                    if (p == program.Count)
+                    {
+                        errores.Add("Se esperaba un ) en la linea " + i);
+                        lineas.Add(i);
+                        break;
+                    }
+                }
+                p++;
+            }
+            p = aux;
+           
+    
+      
+    }
+
+    private bool exp(int token){
+        switch (token)
+        {
+            case 215:
+                return true;
+            case 206:
+                return true;
+            case 101:
+                return true;
+            case 103:
+                return true;
+            default:
+                return false;
+        }
+    }
+    private bool operadorBin(int token){
+        switch(token){
+            case 108:
+                return true;
+            case 109:
+                return true;
+            case 104:
+                return true;
+            case 105:
+                return true;
+            case 116:
+                return true;
+            case 118:
+                return true;
+            case 112:
+                return true;
+            case 117:
+                return true;
+            case 119:
+                return true;
+            case 120:
+                return true;
+            case 121:
+                return true;
+            case 122:
+                return true;
+            case 123:
+                return true;
+            case 201:
+                return true;
+            case 211:
+                return true;  
+            default:
+                return false;      
+        }
     }
     private bool esIf(int token)
     {
@@ -432,56 +478,59 @@ namespace Ejemplo1
         }
         return false;
     }
-    private bool exp(int token){
-        switch (token)
+    private bool esPrint(int token)
+    {
+        if (token == 216)
         {
-            case 215:
-                return true;
-            case 206:
-                return true;
-            case 101:
-                return true;
-            case 102:
-                return true;
-            case 103:
-                return true;
-            default:
-                return false;
+            return true;
         }
+        return false;
     }
-    private bool operadorBin(int token){
-        switch(token){
-            case 108:
-                return true;
-            case 109:
-                return true;
-            case 104:
-                return true;
-            case 105:
-                return true;
-            case 116:
-                return true;
-            case 118:
-                return true;
-            case 112:
-                return true;
-            case 117:
-                return true;
-            case 119:
-                return true;
-            case 120:
-                return true;
-            case 121:
-                return true;
-            case 122:
-                return true;
-            case 201:
-                return true;
-            case 211:
-                return true;  
-            default:
-                return false;      
+
+    private bool esElse(int token)
+    {
+        if (token == 204)
+        {
+            return true;
         }
+        return false;
+    }
+
+    private bool esComa(int token)
+    {
+        if (token == 125)
+        {
+            return true;
+        }
+        return false;
+
+    }
+    private bool esDo(int token)
+    {
+        if (token == 203)
+        {
+            return true;
+        }
+        return false;
+
+    }
+    private bool espaDer(int token)
+    {
+        if (token == 115)
+        {
+            return true;
+        }
+        return false;
+
+    }
+    private bool espaIzq(int token)
+    {
+        if (token == 114)
+        {
+            return true;
+        }
+        return false;
     }
 }
+
 }
