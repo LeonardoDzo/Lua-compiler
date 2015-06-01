@@ -37,6 +37,7 @@ namespace Ejemplo1
         {
             p = 0;
             i = 1;
+            lineas.Clear();
             while (p < program.Count)
             { 
                 sentencia();
@@ -324,6 +325,7 @@ namespace Ejemplo1
                 {
                     p++;
                     Metodoexp();
+     
 
                 }
                 else
@@ -338,7 +340,6 @@ namespace Ejemplo1
                 errores.Add("Falta una expresion en la linea " + i);
                 lineas.Add(i);
                 if (p < program.Count && program[p] == 24) { i++; p++; }
-         
             return false;
         }
         return true;
@@ -359,7 +360,6 @@ namespace Ejemplo1
                 }
                 else
                 {
-
                     if (p == program.Count)
                     {
                         errores.Add("Se esperaba un ) en la linea " + i);

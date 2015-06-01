@@ -8,14 +8,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace Ejemplo1
 {
     public partial class CompiladorLua : Form
     {
         static StreamWriter escribir;
-
-        static string[] palReservadas = new string[] { "and", "break", "do", "else", "end", "false", "for", "if", "in", "nil", "not", "or", "return", "then", "true" };
+        static int posicion = 0;
+        static string[] palReservadas = new string[] { "and", "break", "do", "else", "end", "false", "for", "if", "nil", "not", "or", "return", "then", "true", "Print" };
         List<string> letras = new List<string>();
         List<string> Errores = new List<string>();
         List<int> lineas = new List<int>();
@@ -28,14 +29,7 @@ namespace Ejemplo1
             
         }
 
-        private void richTextBox1_KeyUp(object sender, KeyEventArgs e)
-        
-        {
-            
-            AnalisisLexico();
-            ColorTxt();
-      
-        }
+   
         static bool mu = false;
         public void AnalisisLexico()
         {
@@ -71,45 +65,21 @@ namespace Ejemplo1
                 }
                 
             }
-            //this.rtxtboxCodigo.TextChanged += (ob, ev) =>
-            //{
-            //    var palabras = this.rtxtboxCodigo.Text.Split(new char[] { ' ' },
-            //    StringSplitOptions.RemoveEmptyEntries);
-            //    var resultado = from b in palReservadas
-            //                    from c in palabras
-
-            //                    where c == b
-            //                    select b;
-
-            //    int inicio = 0;
-            //    foreach (var item in resultado)
-            //    {
-            //        inicio = this.rtxtboxCodigo.Text.IndexOf(item, inicio);
-            //        this.rtxtboxCodigo.Select(inicio, item.Length);
-            //        this.rtxtboxCodigo.SelectionColor = Color.Aquamarine;
-            //        this.rtxtboxCodigo.SelectionStart = this.rtxtboxCodigo.Text.Length;
-            //        inicio++;
-            //    }
-
-            //    this.rtxtboxCodigo.SelectionColor = Color.White;
-            //    this.rtxtboxCodigo.SelectionStart = this.rtxtboxCodigo.Text.Length;
-
-            //};
             letras.Clear();
             
         }
-        private void ColorTxt()
-        {
-          
-        }
+    
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 rtxtboxCodigo.Text = File.ReadAllText(openFileDialog1.FileName);
-                ColorTxt();
+               
             }
+           
             AnalisisLexico();
+            BuscarCoincidencia();
+            
             
         }
 
@@ -122,8 +92,7 @@ namespace Ejemplo1
                     escribir = new StreamWriter(saveFileDialog1.FileName);
                     escribir.Write(rtxtboxCodigo.Text);
                     escribir.Close();
-                   
-                    
+
                 }
             }
             catch
@@ -145,7 +114,7 @@ namespace Ejemplo1
             Sintaxis sx = new Sintaxis();
             sx.Program = program;
             sx.inicializa();
-           
+            BuscarCoincidencia();
             Errores = sx.Errores();
             lineas = sx.Lineas();
             foreach (var item in Errores)
@@ -154,7 +123,7 @@ namespace Ejemplo1
             }
             MessageBox.Show("Compilacin terminada");
         }
-
+      
         private void lbxErrores_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (lbxErrores.Focus())
@@ -162,7 +131,7 @@ namespace Ejemplo1
                 int i = 0;
                 i = lbxErrores.SelectedIndex;
 
-               
+
                 //int position = this.rtxtboxCodigo.GetCharIndexFromPosition(p);
 
                 //int Linea = this.rtxtboxCodigo.GetLineFromCharIndex(position);
@@ -176,12 +145,149 @@ namespace Ejemplo1
             {
                 rtxtboxCodigo.ClearUndo();
             }
-            
+
+
+           
             
             
 
         }
+        private void rtxtboxCodigo_MouseClick(object sender, MouseEventArgs e)
+        {
+            int firstcharindex = rtxtboxCodigo.GetFirstCharIndexOfCurrentLine();
+            int currentline = rtxtboxCodigo.GetLineFromCharIndex(firstcharindex);
+            string currentlinetext = rtxtboxCodigo.Lines[currentline];
+            rtxtboxCodigo.Select(firstcharindex, currentlinetext.Length);
+        }
 
+        private void rtxtboxCodigo_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            AnalisisLexico();
+            //string comparar = "";
+            //int indice = 0;
+            //if (Convert.ToInt32(e.KeyChar) == Convert.ToInt32(Keys.Space))
+            //{
+
+            //    comparar = rtxtboxCodigo.Text;
+            //    char[] arreglo = rtxtboxCodigo.Text.ToCharArray();
+            //    for (int i = 0; i < rtxtboxCodigo.TextLength; i++)
+            //    {
+            //        if (arreglo[i] == ' ')
+            //        {
+            //            indice = i;
+            //        }
+            //    }
+            //    comparar = null;
+            //    if (indice != 0)
+            //    {
+            //        indice++;
+            //    }
+            //    for (int i = indice; i < rtxtboxCodigo.Text.Length; i++)
+            //    {
+            //        comparar += arreglo[i];
+            //    }
+            //    ColorTxt(comparar, indice);
+            //}
+
+            
+ 
+            //this.rtxtboxCodigo.SelectionStart = this.rtxtboxCodigo.Text.Length;
+ 
+            //this.rtxtboxCodigo.TextChanged += (ob, ev) =>
+            //    {
+            //        posicion = rtxtboxCodigo.SelectionStart;
+            //        ColorTxt();
+            //    };
+ 
+           
+        }
+        private void ColorTxt()
+        {
+            //for (int i = 0; i < palReservadas.Length; i++)
+            //{
+            //    if (palReservadas[i] == comparar)
+            //    {
+            //        rtxtboxCodigo.Select(indice, rtxtboxCodigo.Text.Length);
+            //        rtxtboxCodigo.SelectionColor = Color.Aqua;
+            //        rtxtboxCodigo.SelectionStart = this.rtxtboxCodigo.Text.Length;
+            //        break;
+            //    }
+            //    else
+            //    {
+            //        rtxtboxCodigo.Select(indice, rtxtboxCodigo.Text.Length);
+            //        rtxtboxCodigo.SelectionColor = Color.White;
+            //        rtxtboxCodigo.SelectionStart = this.rtxtboxCodigo.Text.Length;
+            //    }
+            //}
+            //this.rtxtboxCodigo.Select(0, rtxtboxCodigo.Text.Length);
+            //this.rtxtboxCodigo.SelectionColor = Color.Black;
+            //this.rtxtboxCodigo.Select(posicion, 0);
+
+            //string[] texto = rtxtboxCodigo.Text.Trim().Split(' ');
+            //int inicio = 0;
+
+            //foreach (string x in texto)
+            //{
+            //    foreach (string y in palReservadas)
+            //    {
+            //        if (x.Length != 0)
+            //        {
+            //            if (x.Trim().Equals(y))
+            //            {
+            //                inicio = this.rtxtboxCodigo.Text.IndexOf(x, inicio);
+            //                this.rtxtboxCodigo.Select(inicio, x.Length);
+            //                rtxtboxCodigo.SelectionColor = Color.Red;
+            //                this.rtxtboxCodigo.Select(posicion, 0);
+            //                inicio = inicio + 1;
+            //            }
+            //        }
+            //    }
+            //}
+        }
+
+        private void BuscarCoincidencia()
+        {
+            MatchCollection Resultados;
+		    Int32 cont =0;
+            rtxtboxCodigo.SelectAll();
+            rtxtboxCodigo.SelectionColor = Color.White;
+            rtxtboxCodigo.SelectionBackColor = Color.DimGray;
+            for (int i = 0; i < palReservadas.Length; i++)
+            {
+                string b = palReservadas[i];
+                Regex busqueda = new Regex(b, RegexOptions.IgnoreCase);
+                Resultados = busqueda.Matches(rtxtboxCodigo.Text);
+                
+
+                // En este punto recorres los resultados de la busqueda
+                // aca si quieres los puedes reemplazar, com resaltarlos, que es lo que hago en este caso.
+                foreach (Match Palabra in Resultados)
+                {
+                    rtxtboxCodigo.SelectionStart = Palabra.Index;
+                    rtxtboxCodigo.SelectionLength = Palabra.Length;
+                    rtxtboxCodigo.SelectionColor = Color.Aqua;
+                    cont++;
+                }
+			
+                
+            }
+           
+			
+}
+
+        private void btn_Lexico_Click(object sender, EventArgs e)
+        {
+            AnalisisLexico();
+            BuscarCoincidencia();
+        }
+
+        private void rtxtboxCodigo_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            rtxtboxCodigo.SelectAll();
+            rtxtboxCodigo.SelectionColor = Color.White;
+            rtxtboxCodigo.SelectionBackColor = Color.DimGray;
+            BuscarCoincidencia();
+        }
        
     }
 }

@@ -41,6 +41,8 @@
             this.label1 = new System.Windows.Forms.Label();
             this.btnCompilar = new System.Windows.Forms.Button();
             this.lbxErrores = new System.Windows.Forms.ListBox();
+            this.btn_Lexico = new System.Windows.Forms.Button();
+            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -53,23 +55,26 @@
             // 
             this.rtxtboxCodigo.BackColor = System.Drawing.Color.DimGray;
             this.rtxtboxCodigo.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.rtxtboxCodigo.Dock = System.Windows.Forms.DockStyle.Fill;
             this.rtxtboxCodigo.ForeColor = System.Drawing.Color.White;
             this.rtxtboxCodigo.Location = new System.Drawing.Point(0, 24);
             this.rtxtboxCodigo.Name = "rtxtboxCodigo";
-            this.rtxtboxCodigo.Size = new System.Drawing.Size(907, 335);
+            this.rtxtboxCodigo.Size = new System.Drawing.Size(913, 347);
             this.rtxtboxCodigo.TabIndex = 2;
             this.rtxtboxCodigo.Text = "";
-            this.rtxtboxCodigo.KeyUp += new System.Windows.Forms.KeyEventHandler(this.richTextBox1_KeyUp);
+            this.rtxtboxCodigo.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.rtxtboxCodigo_KeyPress);
+            this.rtxtboxCodigo.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.rtxtboxCodigo_MouseDoubleClick);
             // 
             // listbxTokens
             // 
             this.listbxTokens.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.listbxTokens.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.listbxTokens.Dock = System.Windows.Forms.DockStyle.Right;
             this.listbxTokens.ForeColor = System.Drawing.Color.White;
             this.listbxTokens.FormattingEnabled = true;
-            this.listbxTokens.Location = new System.Drawing.Point(913, 25);
+            this.listbxTokens.Location = new System.Drawing.Point(913, 24);
             this.listbxTokens.Name = "listbxTokens";
-            this.listbxTokens.Size = new System.Drawing.Size(168, 444);
+            this.listbxTokens.Size = new System.Drawing.Size(180, 455);
             this.listbxTokens.TabIndex = 4;
             // 
             // menuStrip1
@@ -154,12 +159,30 @@
             // lbxErrores
             // 
             this.lbxErrores.BackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.lbxErrores.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.lbxErrores.FormattingEnabled = true;
-            this.lbxErrores.Location = new System.Drawing.Point(0, 365);
+            this.lbxErrores.Location = new System.Drawing.Point(0, 371);
             this.lbxErrores.Name = "lbxErrores";
-            this.lbxErrores.Size = new System.Drawing.Size(907, 108);
+            this.lbxErrores.Size = new System.Drawing.Size(913, 108);
             this.lbxErrores.TabIndex = 8;
             this.lbxErrores.SelectedIndexChanged += new System.EventHandler(this.lbxErrores_SelectedIndexChanged);
+            // 
+            // btn_Lexico
+            // 
+            this.btn_Lexico.Location = new System.Drawing.Point(832, 0);
+            this.btn_Lexico.Name = "btn_Lexico";
+            this.btn_Lexico.Size = new System.Drawing.Size(75, 23);
+            this.btn_Lexico.TabIndex = 9;
+            this.btn_Lexico.Text = "Lexico";
+            this.btn_Lexico.UseVisualStyleBackColor = true;
+            this.btn_Lexico.Click += new System.EventHandler(this.btn_Lexico_Click);
+            // 
+            // flowLayoutPanel1
+            // 
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(293, 69);
+            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(200, 100);
+            this.flowLayoutPanel1.TabIndex = 10;
             // 
             // CompiladorLua
             // 
@@ -167,11 +190,13 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.ClientSize = new System.Drawing.Size(1093, 479);
+            this.Controls.Add(this.rtxtboxCodigo);
+            this.Controls.Add(this.flowLayoutPanel1);
+            this.Controls.Add(this.btn_Lexico);
             this.Controls.Add(this.lbxErrores);
             this.Controls.Add(this.btnCompilar);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.listbxTokens);
-            this.Controls.Add(this.rtxtboxCodigo);
             this.Controls.Add(this.menuStrip1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.MainMenuStrip = this.menuStrip1;
@@ -202,6 +227,8 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btnCompilar;
         private System.Windows.Forms.ListBox lbxErrores;
+        private System.Windows.Forms.Button btn_Lexico;
+        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
     }
 }
 
