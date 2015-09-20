@@ -1,74 +1,91 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace Ejemplo1
 {
     public partial class CompiladorLua : Form
     {
+        // DELEGADOS
+        internal delegate void Delegado(ListViewItem listView);
         static StreamWriter escribir;
-        static int posicion = 0;
-        static string[] palReservadas = new string[] { "and", "break", "do", "else", "end", "false", "for", "if", "nil", "not", "or", "return", "then", "true", "Print" };
+        Lexico lx = new Lexico();
+        static string[] palReservadas = new string[] { "and", "break", "else", "end", "false", "for", "if", "nil", "not", "or", "return", "then", "true", "Print","~", "=", ">", "<" };
         List<string> letras = new List<string>();
-        List<string> Errores = new List<string>();
-        List<int> lineas = new List<int>();
-        List<int> program = new List<int>();
-        
+
+        private Thread hilo;
         public CompiladorLua()
         {
             InitializeComponent();
-
-            
         }
 
    
         static bool mu = false;
         public void AnalisisLexico()
         {
-            program.Clear();
+           
             string cadena;
             string[] lineCount = rtxtboxCodigo.Lines;
            
-            listbxTokens.Items.Clear();
+            lx.Strucs.Clear();
+            lbxErrores.Items.Clear();
+            lx.ErroresList().Clear();
+            
+            
+            if (rtxtboxCodigo.Text == "")
+            {
+                lx.Strucs.Clear();
+                listView1.Clear();
+            } 
             for (int i = 0; i < lineCount.Length; i++)
             {
                 cadena = lineCount[i];
-
-                if (cadena == "") { program.Add(24); continue; }
-                Lexico lx = new Lexico();
-                
+                //Envio linea escrita
                 lx.Cadena = cadena;
                 lx.Inicializa();
-                
+                //Envio el numero de linea en el que me encuentro
                 lx.Linea = i;
-                
+                //Aquí hago referencia para siestoy en comentario multilinea
                 lx.Multi1 = mu;
+                //Mando analisar el renglon
                 lx.AnalisisContenedor();
                 mu = lx.Multi();
-                letras = lx.Lista();
-                program = lx.Program();
-                program.Add(24);
-                 
-                
-                
-                foreach (string a in letras)
+                //Limpia el listview de los tokens y lexemas
+                listView1.Columns.Clear();
+                listView1.Clear();
+                listView1.Columns.Add("Token");
+                listView1.Columns.Add("Lexema");
+
+                string[] slitem = new String[2];
+                ListViewItem lvi;
+                foreach (var item in lx.Strucs)
                 {
-                    listbxTokens.Items.Add(a);
+                    slitem[0] = Convert.ToString(item.token);
+                    slitem[1] = item.lexema;
+                    lvi = new ListViewItem(slitem);
+                    listView1.Items.Add(lvi);
+
                 }
+
+
+                foreach (string a in lx.ErroresList())
+                {
+                    lbxErrores.Items.Add(a);
+                }
+              
                 
             }
+            
             letras.Clear();
             
         }
-    
+
+      
+
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
@@ -79,8 +96,6 @@ namespace Ejemplo1
            
             AnalisisLexico();
             BuscarCoincidencia();
-            
-            
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -92,7 +107,6 @@ namespace Ejemplo1
                     escribir = new StreamWriter(saveFileDialog1.FileName);
                     escribir.Write(rtxtboxCodigo.Text);
                     escribir.Close();
-
                 }
             }
             catch
@@ -109,15 +123,16 @@ namespace Ejemplo1
         private void btnCompilar_Click(object sender, EventArgs e)
         {
             lbxErrores.Items.Clear();
-            AnalisisLexico();
-            Errores.Clear();
+            btn_Lexico_Click(sender,e);
+            
             Sintaxis sx = new Sintaxis();
-            sx.Program = program;
-            sx.inicializa();
+            sx.Strucs = lx.Strucs;
+            //sx.Program = program;
+            sx.Inicializa();
             BuscarCoincidencia();
-            Errores = sx.Errores();
-            lineas = sx.Lineas();
-            foreach (var item in Errores)
+            
+            //lineas = sx.Lineas();
+            foreach (var item in sx.Errores())
             {
                 lbxErrores.Items.Add(item);
             }
@@ -128,121 +143,18 @@ namespace Ejemplo1
         {
             if (lbxErrores.Focus())
             {
-                int i = 0;
-                i = lbxErrores.SelectedIndex;
-
-
-                //int position = this.rtxtboxCodigo.GetCharIndexFromPosition(p);
-
-                //int Linea = this.rtxtboxCodigo.GetLineFromCharIndex(position);
-                int start = this.rtxtboxCodigo.GetFirstCharIndexFromLine(lineas[i]);
-
-                int end = this.rtxtboxCodigo.Lines[(lineas[i] - 1)].Length;
-                this.rtxtboxCodigo.Select(Math.Abs(lineas[i]), end + 1);
-                this.rtxtboxCodigo.SelectionBackColor = Color.Blue;
+                
             }
             else
             {
                 rtxtboxCodigo.ClearUndo();
             }
 
-
-           
-            
-            
-
-        }
-        private void rtxtboxCodigo_MouseClick(object sender, MouseEventArgs e)
-        {
-            int firstcharindex = rtxtboxCodigo.GetFirstCharIndexOfCurrentLine();
-            int currentline = rtxtboxCodigo.GetLineFromCharIndex(firstcharindex);
-            string currentlinetext = rtxtboxCodigo.Lines[currentline];
-            rtxtboxCodigo.Select(firstcharindex, currentlinetext.Length);
         }
 
         private void rtxtboxCodigo_KeyPress(object sender, KeyPressEventArgs e)
         {
             AnalisisLexico();
-            //string comparar = "";
-            //int indice = 0;
-            //if (Convert.ToInt32(e.KeyChar) == Convert.ToInt32(Keys.Space))
-            //{
-
-            //    comparar = rtxtboxCodigo.Text;
-            //    char[] arreglo = rtxtboxCodigo.Text.ToCharArray();
-            //    for (int i = 0; i < rtxtboxCodigo.TextLength; i++)
-            //    {
-            //        if (arreglo[i] == ' ')
-            //        {
-            //            indice = i;
-            //        }
-            //    }
-            //    comparar = null;
-            //    if (indice != 0)
-            //    {
-            //        indice++;
-            //    }
-            //    for (int i = indice; i < rtxtboxCodigo.Text.Length; i++)
-            //    {
-            //        comparar += arreglo[i];
-            //    }
-            //    ColorTxt(comparar, indice);
-            //}
-
-            
- 
-            //this.rtxtboxCodigo.SelectionStart = this.rtxtboxCodigo.Text.Length;
- 
-            //this.rtxtboxCodigo.TextChanged += (ob, ev) =>
-            //    {
-            //        posicion = rtxtboxCodigo.SelectionStart;
-            //        ColorTxt();
-            //    };
- 
-           
-        }
-        private void ColorTxt()
-        {
-            //for (int i = 0; i < palReservadas.Length; i++)
-            //{
-            //    if (palReservadas[i] == comparar)
-            //    {
-            //        rtxtboxCodigo.Select(indice, rtxtboxCodigo.Text.Length);
-            //        rtxtboxCodigo.SelectionColor = Color.Aqua;
-            //        rtxtboxCodigo.SelectionStart = this.rtxtboxCodigo.Text.Length;
-            //        break;
-            //    }
-            //    else
-            //    {
-            //        rtxtboxCodigo.Select(indice, rtxtboxCodigo.Text.Length);
-            //        rtxtboxCodigo.SelectionColor = Color.White;
-            //        rtxtboxCodigo.SelectionStart = this.rtxtboxCodigo.Text.Length;
-            //    }
-            //}
-            //this.rtxtboxCodigo.Select(0, rtxtboxCodigo.Text.Length);
-            //this.rtxtboxCodigo.SelectionColor = Color.Black;
-            //this.rtxtboxCodigo.Select(posicion, 0);
-
-            //string[] texto = rtxtboxCodigo.Text.Trim().Split(' ');
-            //int inicio = 0;
-
-            //foreach (string x in texto)
-            //{
-            //    foreach (string y in palReservadas)
-            //    {
-            //        if (x.Length != 0)
-            //        {
-            //            if (x.Trim().Equals(y))
-            //            {
-            //                inicio = this.rtxtboxCodigo.Text.IndexOf(x, inicio);
-            //                this.rtxtboxCodigo.Select(inicio, x.Length);
-            //                rtxtboxCodigo.SelectionColor = Color.Red;
-            //                this.rtxtboxCodigo.Select(posicion, 0);
-            //                inicio = inicio + 1;
-            //            }
-            //        }
-            //    }
-            //}
         }
 
         private void BuscarCoincidencia()
@@ -257,22 +169,19 @@ namespace Ejemplo1
                 string b = palReservadas[i];
                 Regex busqueda = new Regex(b, RegexOptions.IgnoreCase);
                 Resultados = busqueda.Matches(rtxtboxCodigo.Text);
-                
-
                 // En este punto recorres los resultados de la busqueda
                 // aca si quieres los puedes reemplazar, com resaltarlos, que es lo que hago en este caso.
                 foreach (Match Palabra in Resultados)
                 {
                     rtxtboxCodigo.SelectionStart = Palabra.Index;
                     rtxtboxCodigo.SelectionLength = Palabra.Length;
-                    rtxtboxCodigo.SelectionColor = Color.Aqua;
+                    rtxtboxCodigo.SelectionColor = Color.Tomato;
                     cont++;
                 }
 			
                 
             }
-           
-			
+	
 }
 
         private void btn_Lexico_Click(object sender, EventArgs e)
@@ -288,6 +197,10 @@ namespace Ejemplo1
             rtxtboxCodigo.SelectionBackColor = Color.DimGray;
             BuscarCoincidencia();
         }
-       
+
+        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
+        }
     }
 }

@@ -1,16 +1,16 @@
-﻿using System;
+﻿
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Ejemplo1
 {
     class Sintaxis
     {
+        
+    
         static List<int> lineas = new List<int>();
         static List<int> program = new List<int>();
-    
+        
         static int i = 1;
         public List<int> Program
         {
@@ -31,7 +31,6 @@ namespace Ejemplo1
 
 
         static int p= 0;
-        
 
         public void inicializa()
         {
@@ -230,11 +229,6 @@ namespace Ejemplo1
                             lineas.Add(i);
 
                         }
-
-                   
-
-
-
                 }
                 else if (esPrint(program[p]))
                 {
@@ -374,8 +368,9 @@ namespace Ejemplo1
     
       
     }
+#region Busca Tokens
 
-    private bool exp(int token){
+        private bool exp(int token){
         switch (token)
         {
             case 215:
@@ -426,7 +421,9 @@ namespace Ejemplo1
                 return false;      
         }
     }
-    private bool esIf(int token)
+        #endregion
+#region Verificaciones
+        private bool esIf(int token)
     {
         if (token == 208)
         {
@@ -532,5 +529,5 @@ namespace Ejemplo1
         return false;
     }
 }
-
+#endregion
 }

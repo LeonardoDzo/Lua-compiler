@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace Ejemplo1
 {
@@ -8,13 +9,11 @@ namespace Ejemplo1
     
     class Lexico 
     {
-            
+        private static List<Struct> strucs = new List<Struct>();
         static string cadena,palabra= "";
         static char[] contenedor;
         static int contador = 0;
-        static List<string> letras = new List<string>();
-        static List<int> program = new List<int>();
-        static List<int> lineas = new List<int>();
+        static List<string> _erroreres = new List<string>(); 
         static List<int> estados = new List<int>();
         static int linea;
 
@@ -40,13 +39,12 @@ namespace Ejemplo1
             Qcoluma = 0;
             Tfila = 0;
             palabra = "";
-            letras.Clear();
+            _erroreres.Clear();
             estados.Clear();
             comillas = false;
-
-           
         }
-        static string[] palReservadas = new string[] { "and", "break", "do", "else", "end", "false", "for", "if", "in", "nil", "not", "or", "return", "then","true","Print"};
+        
+        static string[] palReservadas = new string[] { "and", "break", "do", "else", "end", "false", "for", "if", "in", "nil", "not", "or", "return", "then","true","print"};
         static string[] Errores = new string[] { "Caracter invalido", "Numero mal escrito", "Falta un igual", "Falta una comilla" };
 
         static int[,] MatrizT = new int[,] {      /*  d	       L	  _       "	      '       -   	  .  	  ;  	 +	     *	     %   	 {   	 }	     (	     )	    <	      >     =	     ~	     [   	]	  Demas, WitheSpace,       ,   /     Enter */
@@ -73,11 +71,17 @@ namespace Ejemplo1
           set { cadena = value; }
         }
 
-          
+        public List<Struct> Strucs
+        {
+            get { return strucs; }
+            set { strucs = value; }
+        }
+
+
         public void AnalisisContenedor(){
             
             contenedor = cadena.ToCharArray();
-            letras.Clear();
+            _erroreres.Clear();
             
              foreach (char VARIABLE in contenedor)
             {
@@ -96,9 +100,6 @@ namespace Ejemplo1
 
                         Tfila = 0;
                         palabra += VARIABLE;
-                     
-
-
                     }
                     else
                     {
@@ -106,8 +107,6 @@ namespace Ejemplo1
                         {
                             palabra += VARIABLE;
                             Tfila = 1;
-                         
-
                         }
                         else
                         {
@@ -179,7 +178,6 @@ namespace Ejemplo1
                                           comillas = true;
                                             palabra += VARIABLE;
                                             Tfila = 4;
-                                         
                                             break;
                                         case '*':
                                             palabra += VARIABLE;
@@ -247,12 +245,10 @@ namespace Ejemplo1
                                             break;
 
                                     }
-
                                 }
                             }
                         }
                 }
-                
             }
                 if (Qcoluma >= 0)
                 {
@@ -260,31 +256,20 @@ namespace Ejemplo1
                     
                     estados.Add(Tfila);
                 }
-            
-
-               
-             
-                
-              
             }
             estados.Add(25);
            
             Verifica();
         }
 
-        public List<string> Lista()
+        public List<string> ErroresList()
         {
-            return letras;
+            return _erroreres;
         }
         public int Cantidad()
         {
             return contador;
         }
-        public List<int> Program()
-        {
-            return program;
-        }
-
         public bool Multi()
         {
             return multi;
@@ -295,7 +280,6 @@ namespace Ejemplo1
             int token = 0;
             for (int i = 0; i < estados.Count; i++)
             {
-               
                    if (estados[i] < 25)
                    {
                        #region: Multilinea
@@ -353,11 +337,9 @@ namespace Ejemplo1
 
                                     if (MatrizT[Qcoluma, estados[i + 1]] == 117 || MatrizT[Qcoluma, estados[i + 1]] == 119 || MatrizT[Qcoluma, estados[i + 1]] == 103 || MatrizT[Qcoluma, estados[i + 1]] == 121 || MatrizT[Qcoluma, estados[i + 1]] == 122)
                                     {
-
                                         palabra += contenedor[i + 1];
                                         token = MatrizT[Qcoluma, estados[i + 1]];
                                         i++;
-
                                     }
                                     else
                                     {
@@ -365,10 +347,7 @@ namespace Ejemplo1
                                         {
                                             token = MatrizT[Qcoluma, estados[i + 1]];
                                         }
-
                                     }
-
-
                                 }
                                 catch { }
 
@@ -393,7 +372,7 @@ namespace Ejemplo1
                                     {
                                         if (token == (k + 500))
                                         {
-                                            letras.Add("Error: " + token + " " + Errores[k] + " Linea: " + (linea + 1) + "Posicion: " + (i + 1));
+                                            _erroreres.Add("Error: " + token + " " + Errores[k] + " Linea: " + linea + "Posicion: " + (i + 1));
                                             break;
                                         }
                                     }
@@ -401,20 +380,19 @@ namespace Ejemplo1
                                 #endregion
                                 else
                                 {
-                                    letras.Add("" + token + " TOKEN " + palabra);
-                                    program.Add(token);
+                                  
+                                    Strucs.Add(new Struct {lexema = palabra,token = token, linea = this.Linea});
+                                   /* letras.Add("" + token + " TOKEN " + palabra);
+                                    program.Add(token);*/
                                 }
-
                                 palabra = "";
                                 Qcoluma = 0;
-
                             }
                         }
                     }
                 }
 
             }
-
-        
+      
     }
 }
