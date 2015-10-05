@@ -44,8 +44,14 @@
             this.listView1 = new System.Windows.Forms.ListView();
             this.Token = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.Lexema = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.lviewVariables = new System.Windows.Forms.ListView();
+            this.Tipo = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.Lex = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.Mascara = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
+            this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // openFileDialog1
@@ -63,7 +69,7 @@
             this.rtxtboxCodigo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(229)))), ((int)(((byte)(229)))), ((int)(((byte)(229)))));
             this.rtxtboxCodigo.Location = new System.Drawing.Point(0, 24);
             this.rtxtboxCodigo.Name = "rtxtboxCodigo";
-            this.rtxtboxCodigo.Size = new System.Drawing.Size(1093, 327);
+            this.rtxtboxCodigo.Size = new System.Drawing.Size(1093, 455);
             this.rtxtboxCodigo.TabIndex = 2;
             this.rtxtboxCodigo.Text = "";
             this.rtxtboxCodigo.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.rtxtboxCodigo_KeyPress);
@@ -151,16 +157,16 @@
             // 
             // lbxErrores
             // 
-            this.lbxErrores.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.lbxErrores.BackColor = System.Drawing.Color.Black;
             this.lbxErrores.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.lbxErrores.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.lbxErrores.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lbxErrores.Font = new System.Drawing.Font("Calibri", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbxErrores.ForeColor = System.Drawing.SystemColors.Info;
             this.lbxErrores.FormattingEnabled = true;
             this.lbxErrores.ItemHeight = 18;
-            this.lbxErrores.Location = new System.Drawing.Point(0, 351);
+            this.lbxErrores.Location = new System.Drawing.Point(0, 0);
             this.lbxErrores.Name = "lbxErrores";
-            this.lbxErrores.Size = new System.Drawing.Size(1093, 128);
+            this.lbxErrores.Size = new System.Drawing.Size(925, 153);
             this.lbxErrores.TabIndex = 8;
             this.lbxErrores.SelectedIndexChanged += new System.EventHandler(this.lbxErrores_SelectedIndexChanged);
             // 
@@ -186,7 +192,7 @@
             this.listView1.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.listView1.Location = new System.Drawing.Point(925, 24);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(168, 327);
+            this.listView1.Size = new System.Drawing.Size(168, 455);
             this.listView1.TabIndex = 10;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
@@ -201,16 +207,54 @@
             this.Lexema.Text = "Lexema";
             this.Lexema.Width = 114;
             // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.lviewVariables);
+            this.panel2.Controls.Add(this.lbxErrores);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.panel2.Location = new System.Drawing.Point(0, 326);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(925, 153);
+            this.panel2.TabIndex = 12;
+            // 
+            // lviewVariables
+            // 
+            this.lviewVariables.Alignment = System.Windows.Forms.ListViewAlignment.SnapToGrid;
+            this.lviewVariables.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lviewVariables.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.Tipo,
+            this.Lex,
+            this.Mascara});
+            this.lviewVariables.Dock = System.Windows.Forms.DockStyle.Right;
+            this.lviewVariables.Location = new System.Drawing.Point(699, 0);
+            this.lviewVariables.Name = "lviewVariables";
+            this.lviewVariables.Size = new System.Drawing.Size(226, 153);
+            this.lviewVariables.TabIndex = 9;
+            this.lviewVariables.UseCompatibleStateImageBehavior = false;
+            this.lviewVariables.View = System.Windows.Forms.View.Details;
+            // 
+            // Tipo
+            // 
+            this.Tipo.Width = 53;
+            // 
+            // Lex
+            // 
+            this.Lex.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // Mascara
+            // 
+            this.Mascara.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
             // CompiladorLua
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.ClientSize = new System.Drawing.Size(1093, 479);
+            this.Controls.Add(this.panel2);
             this.Controls.Add(this.listView1);
             this.Controls.Add(this.rtxtboxCodigo);
             this.Controls.Add(this.btn_Lexico);
-            this.Controls.Add(this.lbxErrores);
             this.Controls.Add(this.btnCompilar);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.menuStrip1);
@@ -223,6 +267,7 @@
             this.menuStrip1.PerformLayout();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            this.panel2.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -246,6 +291,11 @@
         private System.Windows.Forms.ColumnHeader Lexema;
         public System.Windows.Forms.ColumnHeader Token;
         public System.Windows.Forms.RichTextBox rtxtboxCodigo;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.ListView lviewVariables;
+        private System.Windows.Forms.ColumnHeader Lex;
+        private System.Windows.Forms.ColumnHeader Mascara;
+        public System.Windows.Forms.ColumnHeader Tipo;
     }
 }
 

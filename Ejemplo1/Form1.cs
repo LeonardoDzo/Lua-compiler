@@ -17,13 +17,12 @@ namespace Ejemplo1
         static string[] palReservadas = new string[] { "and", "break", "else", "end", "false", "for", "if", "nil", "not", "or", "return", "then", "true", "Print","~", "=", ">", "<" };
         List<string> letras = new List<string>();
 
-        private Thread hilo;
         public CompiladorLua()
         {
             InitializeComponent();
         }
 
-   
+
         static bool mu = false;
         public void AnalisisLexico()
         {
@@ -59,8 +58,7 @@ namespace Ejemplo1
                 listView1.Clear();
                 listView1.Columns.Add("Token");
                 listView1.Columns.Add("Lexema");
-
-                string[] slitem = new String[2];
+                string[] slitem = new String[3];
                 ListViewItem lvi;
                 foreach (var item in lx.Strucs)
                 {
@@ -124,13 +122,33 @@ namespace Ejemplo1
         {
             lbxErrores.Items.Clear();
             btn_Lexico_Click(sender,e);
-            
+    
             Sintaxis sx = new Sintaxis();
             sx.Strucs = lx.Strucs;
             //sx.Program = program;
             sx.Inicializa();
             BuscarCoincidencia();
-            
+            listView1.Columns.Clear();
+            listView1.Clear();
+
+            //Llenar lista de variables
+            lviewVariables.Columns.Clear();
+            lviewVariables.Clear();
+            lviewVariables.Columns.Add("Tipo");
+            lviewVariables.Columns.Add("Lex");
+            lviewVariables.Columns.Add("Mascara");
+            string[] sitem = new String[3];
+            ListViewItem lvi1;
+            foreach (var item in sx.Identificadoreses)
+            {
+                sitem[0] = Convert.ToString(item.tipo);
+                sitem[1] = item.lexema;
+                sitem[2] = item.mascara;
+                lvi1 = new ListViewItem(sitem);
+                lviewVariables.Items.Add(lvi1);
+
+            }
+
             //lineas = sx.Lineas();
             foreach (var item in sx.Errores())
             {
@@ -199,6 +217,11 @@ namespace Ejemplo1
         }
 
         private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
+        }
+
+        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
 
         }

@@ -1,7 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Text;
-using System.IO;
-using System.Runtime.InteropServices.ComTypes;
 
 namespace Ejemplo1
 {
@@ -15,7 +12,7 @@ namespace Ejemplo1
         static int contador = 0;
         static List<string> _erroreres = new List<string>(); 
         static List<int> estados = new List<int>();
-        static int linea;
+        static int linea, index=0;
 
         public int Linea
         {
@@ -117,8 +114,6 @@ namespace Ejemplo1
                                     case '+':
                                         palabra += VARIABLE;
                                         Tfila = 8;
-                                    
-
                                         break;
                                     case '<':
                                         palabra += VARIABLE;
@@ -381,7 +376,7 @@ namespace Ejemplo1
                                 else
                                 {
                                   
-                                    Strucs.Add(new Struct {lexema = palabra,token = token, linea = this.Linea});
+                                    Strucs.Add(new Struct {index = index++,lexema = palabra,token = token, linea = this.Linea, tipo = token});
                                    /* letras.Add("" + token + " TOKEN " + palabra);
                                     program.Add(token);*/
                                 }
