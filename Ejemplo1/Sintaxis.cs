@@ -1,426 +1,729 @@
-﻿
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 
 namespace Ejemplo1
 {
     class Sintaxis
     {
-        
-    
-        static List<int> lineas = new List<int>();
-        static List<int> program = new List<int>();
-        
-        static int i = 1;
-        public List<int> Program
+        #region Encontrar Valor
+        List<Identificadores> _identificadoreses = new List<Identificadores>();
+        Queue<Struct> queueSolucions = new Queue<Struct>();
+        Stack<Struct> stackAnalisis = new Stack<Struct>();
+        Stack<int> soluciStack  = new Stack<int>();
+        private static int tipo = 0;
+        #endregion
+
+        private int _controlvar = 0;
+        #region  asigancion identificadores
+        private Queue<int> operacionQueue = new Queue<int>(); 
+        private static List<string> _idenuso = new List<string>() ;
+      
+#endregion
+
+        static List<Struct> _structs = new List<Struct>();
+        public static readonly List<string> errores = new List<string>();
+        static readonly String[] _error = new string[]
         {
-            get { return Sintaxis.program; }
-            set { Sintaxis.program = value; }
+            "Se esperaba un End en la linea: ",
+            "Se esperaba la palabra reservada Then en la linea: ",
+            "Se esperaba un = en la linea: ",
+            "No se declara el identificador en la linea ",
+            "Se esperaba un parentesis en la linea: ",
+            "Error de sintaxis en la linea: ",
+            "Falta una expresion en la linea: "
+        };
+
+        static readonly String[] _errorSemantica = new string[]
+        {
+            
+            "stdin:1: attempt to perform arithmetic on a string value",
+            "stdin:1: attempt to perform arithmetic on a boolean value",
+            "stdin:1: malformed number near",
+            "stdin:1: attempt to concatenate a boolean value"
+        };
+        #region Getter & Setter
+        public List<Struct> Strucs
+        {
+            get { return _structs; }
+            set { _structs = value; }
         }
-        static List<string> errores = new List<string>();
-       
+
+        public List<Identificadores> Identificadoreses
+        {
+            get { return _identificadoreses; }
+            set { _identificadoreses = value; }
+        }
 
         public List<string> Errores()
         {
             return errores;
         }
-        public List<int> Lineas()
-        {
-            return lineas;
-        }
-
+#endregion
 
         static int p= 0;
 
-        public void inicializa()
+        public void Inicializa()
         {
+            errores.Clear();
             p = 0;
-            i = 1;
-            lineas.Clear();
-            while (p < program.Count)
-            { 
-                sentencia();
+            while (p < _structs.Count)
+            {
+                Sentencia();
             }
         }
-        private void chunk()
-        {
-            sentencia();
-        }
-        private void bloque()
-        {
-            chunk();
-        }
- 
- 
-        public void sentencia(){
+        private void Chunk() => Sentencia();
 
-            while (p < program.Count && program[p] == 24) { i++; p++; }
-            if (p < program.Count)
+        internal void Bloque() => Chunk();
+
+        public void Sentencia(){
+
+            if (p < _structs.Count)
             {
-                if (esIf(program[p]))
+                if (esIf(_structs[p].token))
                 {
                     p++;
                    
                     if (Metodoexp())
                     {
-                        if (esThen(program[p]))
+                        if (esThen(_structs[p].token))
                         {
-
                             p++;
-                            if (p < program.Count && program[p] == 24) { i++; p++; }
-                            if (p < program.Count && esElse(program[p]))
+                            if (p<_structs.Count && !esElse(_structs[p].token) && !esEnd(_structs[p].token))
+                            {
+                                do
+                                {
+                                    Sentencia();
+                                } while (p < _structs.Count && (!esElse(_structs[p].token) && !esEnd(_structs[p].token)));
+                            }
+                            if (p < _structs.Count && esElse(_structs[p].token))
                             {
                                 p++;
-                                if (p < program.Count && program[p] == 24) { i++; p++; }
-                            }
-                            if (p < program.Count && esEnd(program[p]))
-                            {
-                                program.RemoveAt(p);
-
-                            }
-                            else
-                            {
-                                
-                                bloque();
-                                if (p < program.Count && program[p] == 24) { i++; p++; }
-                                if (p < program.Count && esElse(program[p]))
+                                if (p < _structs.Count && !esEnd(_structs[p].token))
                                 {
-                                    p++;
-                                    if (p < program.Count && program[p] == 24) { i++; p++; }
-                                }
-                                int aux = p;
-                                while (p <= program.Count)
-                                {
-                                    if (p < program.Count && esEnd(program[p]))
+                                    do
                                     {
-                                        program.RemoveAt(p);
+                                        Sentencia();
+                                    } while (p < _structs.Count && !esEnd(_structs[p].token));
+                                }
+                                
+                            }
+                            int aux = p;
+                            while (p <= _structs.Count)
+                            {
+                                if (p < _structs.Count && esEnd(_structs[p].token))
+                                {
+                                    //structs.RemoveAt(p);
+                                    break;
+                                }
+                                else 
+                                {
+                                    if (p == _structs.Count)
+                                    {
+                                        errores.Add(_error[0] + _structs[p-1].linea);
                                         break;
                                     }
-                                    else 
-                                    {
-                                        
-                                        if (p == program.Count)
-                                        {
-                                            errores.Add("Se esperaba un End en la linea " + i);
-                                            lineas.Add(i);
-                                            break;
-                                        }
-                                    }
-                                    p++;
-                                    if (p < program.Count && program[p] == 24) { i++; p++; }
-                                    
                                 }
-                                p = aux;
-
+                                p++;    
                             }
-                           
-                            
+                            p = aux+1;
+                              
                         }
                         else
                         {
-                            errores.Add("Se esperaba la palabra reservada Then en la linea " + i);
-                            lineas.Add(i);
-                            
+                            errores.Add(_error[1] + _structs[p-1].linea);    
                         }
                     }
-                    
-
                 }
-                else if (esFor(program[p]))
+                else if (esFor(_structs[p].token))
                 {
                      p++;
                   
-                     if (esIden(program[p]))
+                     if (esIden(_structs[p].token))
                      {
+                         ScheariD();
                          p++;
                         
-                         if (esIgual(program[p]))
+                         if (esIgual(_structs[p].token))
                          {
                              p++;
                             
-                             Metodoexp();
-                             if (esComa(program[p]))
+                            Metodoexp();
+                            while (stackAnalisis.Count > 0)
+                            {
+                                queueSolucions.Enqueue(stackAnalisis.Pop());
+                            }
+                            AsignarValor();
+                            AsignarTipo(_idenuso, soluciStack.Pop());
+                            soluciStack.Clear();
+                            _idenuso.Clear(); 
+
+                            if (esComa(_structs[p].token))
                              {
                                  p++;
                                  
                                  Metodoexp();
-                                 if (esDo(program[p]))
+                                 if(soluciStack.Pop() > 205)
+                                 if (esDo(_structs[p].token))
                                  {
                                      p++;
-                                     if (p < program.Count && program[p] == 24) { i++; p++; }
-                                     if (p < program.Count && esEnd(program[p]))
+                                    
+                                     if (p < _structs.Count && esEnd(_structs[p].token))
                                      {
-                                         program.RemoveAt(p);
+                                         _structs.RemoveAt(p);
 
                                      }
                                      else
                                      {
-                                         bloque();
+                                         Bloque();
                                          int aux = p;
-                                         while (p <= program.Count)
+                                         while (p <= _structs.Count)
                                          {
-                                             if (p < program.Count && esEnd(program[p]))
+                                             if (p < _structs.Count && esEnd(_structs[p].token))
                                              {
-                                                 program.RemoveAt(p);
+                                                 _structs.RemoveAt(p);
                                                  break;
                                              }
                                              else
                                              {
-                                                 if (p == program.Count)
+                                                 if (p == _structs.Count)
                                                  {
-                                                     errores.Add("Se esperaba un end en la linea " + i);
-                                                     lineas.Add(i);
+                                                     errores.Add(_error[0] + _structs[aux-1].linea); 
                                                      break;
                                                  }
                                              }
                                              p++;
-                                             
-
                                          }
                                          p = aux;
-                                         if (p < program.Count && program[p] == 24) { i++; p++; }
-
                                      }
-                                     
                                      }
                                      else
                                      {
-                                         errores.Add("Se esperaba la palabra reservada do en la linea " + i);
-                                         lineas.Add(i);
-
+                                         errores.Add(_error[1] + _structs[p-1].linea);
                                      }
-
-                                 }
-
+                            }
                          }
                          else
                          {
-                             errores.Add("Se esperaba un = en la linea " + i);
-                             lineas.Add(i);
+                             errores.Add(_error[2] + _structs[p-1].linea);
                          }
-
                      }
                      else
                      {
-                         errores.Add("No se declara el identificador en la linea " + i);
-                         lineas.Add(i);
+                         errores.Add(_error[3]+ _structs[p-1].linea);     
                      }
                 }
-                else if (esIden(program[p]))
+                else if (esIden(_structs[p].token))
                 {
+                    ScheariD();
+                    _idenuso.Add(_structs[p].lexema);
                         p++;
-                        if (varList())
+                        if (VarList())
                         {
-
-                            if (p < program.Count && esIgual(program[p]))
+                            if (p < _structs.Count && esIgual(_structs[p].token))
                             {
                                 p++;
                                 Metodoexp();
-
+                                while (stackAnalisis.Count>0)
+                                {
+                                    queueSolucions.Enqueue(stackAnalisis.Pop());
+                                }
+                                AsignarValor();
+                                AsignarTipo(_idenuso, soluciStack.Pop());
+                                soluciStack.Clear();
+                                _idenuso.Clear();;
                             }
                             else
                             {
-                                errores.Add("Se esperaba un igual en la linea " + i);
-                                lineas.Add(i);
+                                errores.Add(_error[2] + _structs[p-1].linea);
                             }
                         }
                         else {
-                            errores.Add("Se esperaba un Identificador en la linea " + i);
-                            lineas.Add(i);
-
+                            errores.Add(_error[3]+ _structs[p-1].linea);
                         }
                 }
-                else if (esPrint(program[p]))
+                else if (esPrint(_structs[p].token))
                 {
                     p++;
-                    if (espaIzq(program[p]))
+                    if (espaIzq(_structs[p].token))
                     {
                         do
                         {
                             p++;
-                           
-                            Metodoexp();
-
-                        } while (esComa(program[p]));
-                        if (p<program[p] && espaDer(program[p]))
+                            if (Exp(_structs[p].token))
+                            {
+                                p++;
+                            }
+                            else
+                            {
+                                Metodoexp();
+                            }
+                            
+                        } while (esComa(_structs[p].token));
+                        if (p<_structs[p].token && espaDer(_structs[p].token))
                         {
                             p++;
                             
                         }
                         else
                         {
-                            errores.Add("Se esperaba un parentesis en la linea " + i);
-                            lineas.Add(i);
+                            errores.Add(_error[4] + _structs[p-1].linea); 
                         }
                     }
                     else
                     {
-                        errores.Add("Se esperaba un parentesis en la linea " + i);
-                        lineas.Add(i);
+                        errores.Add(_error[4] + _structs[p-1].linea);
                     }
 
                 }
                 else
                 {
-                    errores.Add("Error de sintaxis en la linea " + i);
-                    lineas.Add(i);
+                    errores.Add(_error[5] + _structs[p-1].linea); 
                     p++;
-                 
                 }
-
-
-            }
-            
-           
-            
+            }      
         }
-
     
-    public bool varList()
-    {
-        bool h=true;
-        while (p < program.Count && esComa(program[p]))
+        public bool VarList()
         {
-            p++;
-            if (p< program.Count && esIden(program[p]))
+            bool h=true;
+            while (p < _structs.Count && esComa(_structs[p].token))
             {
-                h = true;
                 p++;
-            }
-            else
-            {
-                h = false;
-                break;
-            }
-
-
-        } 
-
-        return h;
-            
-            
-    }
-              
-    private bool Metodoexp(){
-       
-            
-         if (p < program.Count && (exp(program[p]) || esIden(program[p]) || espaIzq(program[p])))
-        {
-                if (espaIzq(program[p]))
+                if (p< _structs.Count && esIden(_structs[p].token))
                 {
-                    prefiexp();
+                    _idenuso.Add(_structs[p].lexema);
+                    p++;
                 }
                 else
                 {
-                    p++;
+                    h = false;
+                    break;
                 }
-               
-                if (p < program.Count && operadorBin(program[p]))
+            } 
+            return h;       
+        }
+              
+        private bool Metodoexp(){
+             if (p < _structs.Count && (Exp(_structs[p].token) || esIden(_structs[p].token) || espaIzq(_structs[p].token)))
+             {
+                if (espaIzq(_structs[p].token))
+                {
+                    AccionaRealizar();
+                    Prefiexp();
+                }
+                else
+                {
+                    if (esIden(_structs[p].token))
+                    {
+                        ScheariD();
+                        queueSolucions.Enqueue(_structs[p]);
+                    }
+                    p++;
+                } 
+                if (p < _structs.Count && operadorBin(_structs[p].token))
                 {
                     p++;
                     Metodoexp();
-     
-
                 }
                 else
                 {
-
                     return true;
-                }
-       
-        }
-        else
-        {
-                errores.Add("Falta una expresion en la linea " + i);
-                lineas.Add(i);
-                if (p < program.Count && program[p] == 24) { i++; p++; }
-            return false;
-        }
-        return true;
-        
-    }
- 
-    private void prefiexp(){
-      
-            p++;
-            Metodoexp();
-            int aux = p;
-            while (p <= program.Count)
+                } 
+            }
+            else
             {
-                if (p < program.Count && espaDer(program[p]))
+                errores.Add(_error[6]+ _structs[p-1].linea);      
+                return false;
+            }
+            return true;      
+        }
+
+        private void Prefiexp(){
+      
+                p++;
+                Metodoexp();
+                int aux = p;
+                while (p <= _structs.Count)
                 {
-                    program.RemoveAt(p);
-                    break;
-                }
-                else
-                {
-                    if (p == program.Count)
+                    if (p < _structs.Count && espaDer(_structs[p].token))
                     {
-                        errores.Add("Se esperaba un ) en la linea " + i);
-                        lineas.Add(i);
+                        AccionaRealizar();
                         break;
                     }
+                    else
+                    {
+                        if (p == _structs.Count)
+                        {
+                            errores.Add(_error[4] + _structs[aux - 1].linea);
+                            break;
+                        }
+                    }
+                    p++;
                 }
-                p++;
+                p = aux+1;
             }
-            p = aux;
-           
-    
-      
-    }
-#region Busca Tokens
+        private void AsignarTipo(List<string> identificador, int tipo)
+        {
+            bool encontrada = false;
+            if (tipo > 0)
+            {
+                int pID = 0;
+                for (int j = 0; j < identificador.Count; j++)
+                {
+                    for (int i = 0; i < _identificadoreses.Count; i++)
+                    {
+                        if (_identificadoreses[i].lexema == identificador[j] && _identificadoreses[i].mascara == identificador[j]+_controlvar)
+                        {
+                            _identificadoreses[i].setTipo(tipo);
+                            encontrada = true;
+                        }
+                    }
+                    if (!encontrada)
+                    {
+                        _identificadoreses.Add(new Identificadores {lexema = identificador[j], tipo = tipo, mascara = identificador[j] + _controlvar});
+                        encontrada = false;
+                    }
+                }
+            }        
+        }
+        private void ScheariD()
+        {
+            bool encontrada = false;
+            for (int i = 0; i < _identificadoreses.Count; i++)
+            {
+                if (_structs[p].lexema == _identificadoreses[i].lexema)
+                {
+                    _structs[p].tipo = _identificadoreses[i].tipo;
+                    encontrada = true;
+                    break;
+                }
+            }
+            if (!encontrada)
+            {
+                _structs[p].setTipo(210);
+                _identificadoreses.Add(new Identificadores { lexema = _structs[p].lexema, tipo = _structs[p].tipo, mascara = _structs[p].lexema + _controlvar});
+                encontrada = false;
+            }
 
-        private bool exp(int token){
+        }
+        #region Analisa y Resuelve operaciones aritmeticas 
+        private void AccionaRealizar()
+        {
+            switch (_structs[p].lexema)
+            {
+                case "*":
+                    stackAnalisis.Push(_structs[p]);
+                    break;
+                case "/":
+                    stackAnalisis.Push(_structs[p]);
+                    break;
+                case "+":
+                    Accionmasomenos(_structs[p].lexema);
+                    break;
+                case "-":
+                    Accionmasomenos(_structs[p].lexema);
+                    break;
+                case ")":
+                    AccionparDerecho();
+                    break;
+                case "(":
+                    stackAnalisis.Push(_structs[p]);
+                    break;
+                case ">":
+                    EsoperadorOrden(_structs[p].lexema);
+                    break;
+                case ">=":
+                   EsoperadorOrden(_structs[p].lexema);
+                    break;
+                case "<":
+                    EsoperadorOrden(_structs[p].lexema);
+                    break;
+                case "<=":
+                    EsoperadorOrden(_structs[p].lexema);
+                    break;
+                case "and":
+                    EsoperadorOrden(_structs[p].lexema);
+                    break;
+                case "or":
+                    EsoperadorOrden(_structs[p].lexema);
+                    break;
+                case "..":
+                    EsoperadorOrden(_structs[p].lexema);
+                    break;
+            }
+        }
+
+        private void EsoperadorOrden(string operador)
+        {
+            for (int i = 0; i < stackAnalisis.Count; i++)
+            {
+                if (stackAnalisis.Peek().lexema != operador)
+                {
+                    queueSolucions.Enqueue(stackAnalisis.Pop());
+                }
+            }
+            stackAnalisis.Push(_structs[p]);
+        }
+
+        protected void AccionparDerecho()
+        {
+            while (stackAnalisis.Count > 0 && stackAnalisis.Peek().lexema != "(")
+            {
+                queueSolucions.Enqueue(stackAnalisis.Pop());
+            }
+            stackAnalisis.Pop();
+        }
+        protected void Accionmasomenos(string c)
+        {
+            if (stackAnalisis.Count == 0)
+            {
+                stackAnalisis.Push(_structs[p]);
+            }
+            else if (stackAnalisis.Peek().lexema == "+" || stackAnalisis.Peek().lexema == "-" || stackAnalisis.Peek().lexema == "(")
+            {
+                stackAnalisis.Push(_structs[p]);
+            }
+            else if (Iteraciondivymult())
+            {
+                stackAnalisis.Push(_structs[p]);
+            }
+
+        }
+        protected bool Iteraciondivymult()
+        {
+            bool v = false;
+            if (stackAnalisis.Count>0 && (stackAnalisis.Peek().lexema == "*" || stackAnalisis.Peek().lexema == "/"))
+            {
+                queueSolucions.Enqueue(stackAnalisis.Pop());
+                Iteraciondivymult();
+                v = true;
+            }
+            return v;
+        }
+
+
+        private void AsignarValor()
+        {    
+            while (queueSolucions.Count >0)
+            {
+                    try
+                    {
+                       
+                        switch (queueSolucions.Peek().lexema)
+                        {
+                            case "*":
+                                Operators();
+                                break;
+                            case "/":
+                                Operators();
+                                break;
+                            case "+":
+                                Operators();
+                                break;
+                            case "-":
+                                Operators();
+                                break;
+                            case "..":
+                                Concatenacion();
+                                break;
+                            case ">":
+                                OperatorsRelacionales();
+                                break;
+                            case ">=":
+                                OperatorsRelacionales();
+                                break;
+                            case "<":
+                                OperatorsRelacionales();
+                                break;
+                            case "<=":
+                                OperatorsRelacionales();
+                                break;
+                            case "and":
+                                OperatorsLogic();
+                                break;
+                            case "or":
+                                OperatorsLogic();
+                                break;
+                            default:
+                                soluciStack.Push(queueSolucions.Dequeue().tipo);
+                                break;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        soluciStack.Push(-1);
+                    }
+                    
+                
+            }
+        }
+
+        public void Concatenacion()
+        {
+            queueSolucions.Dequeue();
+            int valor2 = soluciStack.Pop();
+            int valor1 = soluciStack.Pop();
+            if (valor1 == 103 && (valor2 == 103 || valor2 == 101))
+            {
+                soluciStack.Push(103);
+            }
+            else if((valor1 == 220 || valor1 == 206 || valor1 == 215 || valor1 == 103) && (valor2 == 220 || valor2 == 206 || valor2 == 215 || valor2 == 103))
+            {
+                errores.Add(_errorSemantica[3]);
+                soluciStack.Push(-1);
+            }else if (valor1 == 101 && (valor2 == 101 || valor2 == 220 || valor2 == 206 || valor2 == 215 || valor2 == 103))
+            {
+                errores.Add(_errorSemantica[2]);
+                soluciStack.Push(-1);
+            }
+            else
+            {
+                soluciStack.Push(-1);
+            }
+        }
+        public void OperatorsLogic()
+        {
+            queueSolucions.Dequeue();
+            int valor2 = soluciStack.Pop();
+            int valor1 = soluciStack.Pop();
+            if ((valor1 == 220 || valor1== 206 || valor1 == 215) && (valor2 ==220 || valor2 == 206 || valor2 == 215))
+            {
+                soluciStack.Push(220);
+            }
+            else
+            {
+                soluciStack.Push(-1);
+                errores.Add(_error[8]);
+            }
+        }
+        public void OperatorsRelacionales()
+        {
+            queueSolucions.Dequeue();
+            int valor2 = soluciStack.Pop();
+            int valor1 = soluciStack.Pop();
+            if (valor1 == 101 && valor2 == 101)
+            {
+                soluciStack.Push(220);
+            }
+            else
+            {
+                soluciStack.Push(-1);
+                errores.Add(_error[7]);
+            }
+        }
+
+        public void Operators()
+        {
+            queueSolucions.Dequeue();
+            int valor2 = soluciStack.Pop();
+            int valor1 = soluciStack.Pop();
+            if (valor1 == 101 && valor2 == 101)
+            {
+                soluciStack.Push(101);
+            }
+            else if((valor1==220 || valor1 ==206 || valor1 ==215 || valor1 == 101) && (valor2 == 220 || valor2 == 206 || valor2 == 215 || valor2 == 101))
+            {
+                errores.Add(_errorSemantica[1]);
+                soluciStack.Push(-1);
+            }else if ((valor1 == 101 || valor1 == 103) && (valor2 == 101 || valor2 == 103))
+            {
+                errores.Add(_errorSemantica[0]);
+                soluciStack.Push(-1);
+            }
+            else
+            {
+                errores.Add("Error semantica");
+                soluciStack.Push(-1);
+            }
+        }
+
+        #endregion   
+        
+        #region Busca Tokens
+
+        private bool Exp(int token)
+        {
+           
         switch (token)
         {
+            case 210:
+                queueSolucions.Enqueue(_structs[p]);
+                return true;
             case 215:
+                queueSolucions.Enqueue(_structs[p]);
                 return true;
             case 206:
+                queueSolucions.Enqueue(_structs[p]);
                 return true;
             case 101:
+                queueSolucions.Enqueue(_structs[p]);
                 return true;
             case 103:
+                queueSolucions.Enqueue(_structs[p]);
                 return true;
             default:
                 return false;
+            }
+    }
+
+
+        private bool operadorBin(int token){
+            
+            switch (token){
+                case 108:
+                    // *
+                    AccionaRealizar();
+                    return true;
+                case 109:
+                    // +
+                    AccionaRealizar();
+                    return true;
+                case 104:
+                    // -
+                    AccionaRealizar();
+                    return true;
+                case 105:
+                    AccionaRealizar();
+                    return true;
+                case 116:
+                    AccionaRealizar();
+                    return true;
+                case 118:
+                    AccionaRealizar();
+                    return true;
+                case 112:
+                    return true;
+                case 117:
+                    AccionaRealizar();
+                    return true;
+                case 119:
+                    AccionaRealizar();
+                    return true;
+                case 120:
+                    return true;
+                case 121:
+                    return true;
+                case 122:
+                    return true;
+                case 123:
+                    // /
+                    AccionaRealizar();
+                    return true;
+                case 201:
+                    //and
+                    AccionaRealizar();
+                    return true;
+                case 212:
+                    //or
+                    AccionaRealizar();
+                    return true;  
+                default:
+                    return false;      
         }
     }
-    private bool operadorBin(int token){
-        switch(token){
-            case 108:
-                return true;
-            case 109:
-                return true;
-            case 104:
-                return true;
-            case 105:
-                return true;
-            case 116:
-                return true;
-            case 118:
-                return true;
-            case 112:
-                return true;
-            case 117:
-                return true;
-            case 119:
-                return true;
-            case 120:
-                return true;
-            case 121:
-                return true;
-            case 122:
-                return true;
-            case 123:
-                return true;
-            case 201:
-                return true;
-            case 211:
-                return true;  
-            default:
-                return false;      
-        }
-    }
+        
         #endregion
 #region Verificaciones
         private bool esIf(int token)
