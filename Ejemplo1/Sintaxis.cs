@@ -8,13 +8,18 @@ namespace Ejemplo1
     class Sintaxis
     {
         #region Encontrar Valor
+        int contadorIF = 0;
+        int contador = 0;
+        ObjPolish ob = new ObjPolish();
+        public static List<ObjPolish> _polish = new List<ObjPolish>();
         List<Identificadores> _identificadoreses = new List<Identificadores>();
         Queue<Struct> queueSolucions = new Queue<Struct>();
         Stack<Struct> stackAnalisis = new Stack<Struct>();
         Stack<Struct> soluciStack  = new Stack<Struct>();
-        private static int tipo = 0;
         #endregion
 
+        private bool activaif = false;
+        private bool activaelse = false;
         private int _controlvar = 0;
         #region  asigancion identificadores
         private Queue<int> operacionQueue = new Queue<int>(); 
@@ -60,10 +65,14 @@ namespace Ejemplo1
         {
             return errores;
         }
+        public List<ObjPolish> Polish
+        {
+            get { return _polish; }
+        }
+        
 #endregion
 
         static int p= 0;
-
         public void Inicializa()
         {
             errores.Clear();
@@ -84,10 +93,17 @@ namespace Ejemplo1
                 if (esIf(_structs[p].token))
                 {
                     p++;
-                   
                     if (Metodoexp())
                     {
-                        if (esThen(_structs[p].token))
+                        while (stackAnalisis.Count > 0)
+                        {
+                            queueSolucions.Enqueue(stackAnalisis.Pop());
+                        }
+                        AsignarValor();
+                        soluciStack.Clear();
+                        
+
+                        if (p < _structs.Count && esThen(_structs[p].token))
                         {
                             p++;
                             if (p<_structs.Count && !esElse(_structs[p].token) && !esEnd(_structs[p].token))
@@ -99,12 +115,15 @@ namespace Ejemplo1
                             }
                             if (p < _structs.Count && esElse(_structs[p].token))
                             {
+                                activaelse = true;
+                                
                                 p++;
                                 if (p < _structs.Count && !esEnd(_structs[p].token))
                                 {
                                     do
                                     {
                                         Sentencia();
+                                        contadorIF++;
                                     } while (p < _structs.Count && !esEnd(_structs[p].token));
                                 }
                                 
@@ -114,7 +133,6 @@ namespace Ejemplo1
                             {
                                 if (p < _structs.Count && esEnd(_structs[p].token))
                                 {
-                                    //structs.RemoveAt(p);
                                     break;
                                 }
                                 else 
@@ -232,12 +250,6 @@ namespace Ejemplo1
                                     queueSolucions.Enqueue(stackAnalisis.Pop());
                                 }
                                 AsignarValor();
-                                //if(soluciStack.Count > 0)
-                                //{
-                                //    AsignarTipo(_idenuso, soluciStack.Pop());
-                                    
-                                //}
-                                
                                 soluciStack.Clear();
                                 _idenuso.Clear();;
                             }
@@ -252,6 +264,7 @@ namespace Ejemplo1
                 }
                 else if (esPrint(_structs[p].token))
                 {
+                    stackAnalisis.Push(_structs[p]);
                     p++;
                     if (espaIzq(_structs[p].token))
                     {
@@ -265,6 +278,13 @@ namespace Ejemplo1
                             else
                             {
                                 Metodoexp();
+                                while (stackAnalisis.Count > 0)
+                                {
+                                    queueSolucions.Enqueue(stackAnalisis.Pop());
+                                }
+                                AsignarValor();
+                                soluciStack.Clear();
+
                             }
                             
                         } while (p < _structs.Count && esComa(_structs[p].token));
@@ -405,9 +425,11 @@ namespace Ejemplo1
             switch (_structs[p].lexema)
             {
                 case "*":
+                    Iteraciondivymult();
                     stackAnalisis.Push(_structs[p]);
                     break;
                 case "/":
+                    Iteraciondivymult();
                     stackAnalisis.Push(_structs[p]);
                     break;
                 case "+":
@@ -450,12 +472,10 @@ namespace Ejemplo1
         }
         private void EsoperadorOrden(string operador)
         {
-            for (int i = 0; i < stackAnalisis.Count; i++)
+           
+            if (stackAnalisis.Count > 0 && stackAnalisis.Peek().lexema != "(" )
             {
-                if (stackAnalisis.Peek().lexema != operador)
-                {
-                    queueSolucions.Enqueue(stackAnalisis.Pop());
-                }
+                queueSolucions.Enqueue(stackAnalisis.Pop());
             }
             stackAnalisis.Push(_structs[p]);
         }
@@ -469,18 +489,16 @@ namespace Ejemplo1
         }
         protected void Accionmasomenos(string c)
         {
-            if (stackAnalisis.Count == 0)
+            for (int i = 0; i < stackAnalisis.Count; i++)
             {
-                stackAnalisis.Push(_structs[p]);
+                Iteraciondivymult();
+                if(stackAnalisis.Peek().lexema == "+" || stackAnalisis.Peek().lexema == "-")
+                {
+                    queueSolucions.Enqueue(stackAnalisis.Pop());
+                }
             }
-            else if (stackAnalisis.Peek().lexema == "+" || stackAnalisis.Peek().lexema == "-" || stackAnalisis.Peek().lexema == "(")
-            {
-                stackAnalisis.Push(_structs[p]);
-            }
-            else if (Iteraciondivymult())
-            {
-                stackAnalisis.Push(_structs[p]);
-            }
+            
+            stackAnalisis.Push(_structs[p]);
 
         }
         protected bool Iteraciondivymult()
@@ -495,26 +513,29 @@ namespace Ejemplo1
             return v;
         }
 
-
+        bool asignacion = false;
         private void AsignarValor()
-        {    
+        {
+            
+
             while (queueSolucions.Count >0)
             {
                     try
                     {
+
                         switch (queueSolucions.Peek().lexema)
                         {
                             case "*":
-                                Operators();
+                                Operators("*");
                                 break;
                             case "/":
-                                Operators();
+                                Operators("/");
                                 break;
                             case "+":
-                                Operators();
+                                Operators("+");
                                 break;
                             case "-":
-                                Operators();
+                                Operators("-");
                                 break;
                             case "..":
                                 Concatenacion();
@@ -531,6 +552,9 @@ namespace Ejemplo1
                             case "<=":
                                 OperatorsRelacionales();
                                 break;
+                            case "==":
+                                OperatorsRelacionales();
+                                break;
                             case "and":
                                 OperatorsLogic();
                                 break;
@@ -540,22 +564,148 @@ namespace Ejemplo1
                             case "=":
                                 OperatorsAsignacion();
                                 break;
-                            default:
+                            case "print":
+                                _polish.Add(new ObjPolish
+                                {
+                                    operador = "print",
+                                    operador1 = soluciStack.Pop().lexema
+                                });
+                                queueSolucions.Dequeue();
+                            break;
+                        default:
                                 soluciStack.Push(queueSolucions.Dequeue());
                                 break;
                         }
                     }
                     catch (Exception e)
                     {
-                        
+                       
                     }
                     
                 
             }
         }
-       
-        #endregion   
-        
+
+        private void OperatorsAsignacion()
+        {
+            bool encontrada = false;
+            queueSolucions.Dequeue();
+            
+            var valor2 = soluciStack.Pop();
+            var valor1 = soluciStack.Pop();
+            if (asignacion)
+            {
+                _polish.Add(new ObjPolish
+                {
+                    operador = "=",
+                    operador1 = "T"+contador,
+                    resultado = valor1.lexema
+                });
+                asignacion = false;
+            }
+            else
+            {
+                _polish.Add(new ObjPolish
+                {
+                    operador = "=",
+                    operador1 = valor2.lexema,
+                    resultado = valor1.lexema
+                });
+            }
+            for (int i = 0; i < _identificadoreses.Count; i++)
+            {
+                if(valor1.lexema == _identificadoreses[i].lexema)
+                {
+                    _identificadoreses[i].tipo = valor2.tipo;
+                    encontrada = true;
+                }
+            }
+            if (!encontrada)
+            {
+                _identificadoreses.Add(new Identificadores { lexema = valor1.lexema, tipo = valor2.tipo, mascara = valor1.lexema + _controlvar });
+            }
+        }
+
+        private void OperatorsRelacionales()
+        {
+            queueSolucions.Dequeue();
+
+            var valor2 = soluciStack.Pop();
+            var valor1 = soluciStack.Pop();
+
+            if ((valor1.tipo == 116 || valor1.tipo == 117 || valor1.tipo == 118 || valor1.tipo == 119 || valor1.tipo == 121) && (valor2.tipo == 116 || valor2.tipo == 117 || valor2.tipo == 118 || valor2.tipo == 119 || valor2.tipo == 121))
+            {
+                soluciStack.Push(valor1);
+            }
+            else
+            {
+                errores.Add("Error Semantica");
+            }
+        }
+
+        private void OperatorsLogic()
+        {
+            queueSolucions.Dequeue();
+
+            var valor2 = soluciStack.Pop();
+            var valor1 = soluciStack.Pop();
+
+            if ((valor1.tipo == 206 || valor1.tipo == 212 || valor1.tipo == 210) && (valor2.tipo == 206 || valor2.tipo == 212 || valor2.tipo == 210))
+            {
+                soluciStack.Push(valor1);
+            }
+            else
+            {
+                errores.Add("Error Semantica");
+            }
+        }
+
+        private void Concatenacion()
+        {
+            queueSolucions.Dequeue();
+
+            var valor2 = soluciStack.Pop();
+            var valor1 = soluciStack.Pop();
+
+            if ((valor1.tipo == 101 || valor1.tipo==103) && (valor2.tipo == 101 || valor2.tipo==103) )
+            {
+                soluciStack.Push(valor1);
+            }
+            else
+            {
+                errores.Add("Error Semantica");
+            }
+        }
+
+        private void Operators(string op)
+        {
+            queueSolucions.Dequeue();
+            
+            var valor2 = soluciStack.Pop();
+            var valor1 = soluciStack.Pop();
+            
+            if (valor1.tipo ==101 && valor2.tipo == 101)
+            {
+                contador++;
+                _polish.Add(new ObjPolish
+                {
+                    operador = op,
+                    operador1 = valor1.lexema,
+                    operador2 = valor2.lexema,
+                    resultado = "T" + contador,
+                });
+                asignacion = true;
+                valor1.lexema = "T" + contador;
+                soluciStack.Push(valor1);
+            }
+            else
+            {
+                errores.Add("Error Semantica");
+            }
+        }
+
+        #endregion
+
         #region Busca Tokens
 
         private bool Exp(int token)

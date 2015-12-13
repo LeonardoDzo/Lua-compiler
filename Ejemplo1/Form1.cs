@@ -122,7 +122,6 @@ namespace Ejemplo1
         {
             lbxErrores.Items.Clear();
             btn_Lexico_Click(sender,e);
-    
             Sintaxis sx = new Sintaxis();
             sx.Strucs = lx.Strucs;
             //sx.Program = program;
@@ -137,7 +136,7 @@ namespace Ejemplo1
             lviewVariables.Columns.Add("Tipo");
             lviewVariables.Columns.Add("Lex");
             lviewVariables.Columns.Add("Mascara");
-            string[] sitem = new String[3];
+            string[] sitem = new String[4];
             ListViewItem lvi1;
             foreach (var item in sx.Identificadoreses)
             {
@@ -146,6 +145,23 @@ namespace Ejemplo1
                 sitem[2] = item.mascara;
                 lvi1 = new ListViewItem(sitem);
                 lviewVariables.Items.Add(lvi1);
+
+            }
+
+            listView2.Columns.Clear();
+            listView2.Clear();
+            listView2.Columns.Add("OP");
+            listView2.Columns.Add("OP1");
+            listView2.Columns.Add("Op2");
+            listView2.Columns.Add("R");
+            foreach (var item in sx.Polish)
+            {
+                sitem[0] = item.operador;
+                sitem[1] = item.operador1;
+                sitem[2] = item.operador2;
+                sitem[3] = item.resultado;
+                lvi1 = new ListViewItem(sitem);
+                listView2.Items.Add(lvi1);
 
             }
 
