@@ -57,9 +57,7 @@
     <Compile Include="Lexico.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="..\..\..\Sintaxis.cs">
-      <Link>Sintaxis.cs</Link>
-    </Compile>
+    <Compile Include="Sintaxis.cs" />
     <Compile Include="Struct.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>

@@ -375,8 +375,8 @@ namespace Ejemplo1
                                 #endregion
                                 else
                                 {
-                                  
-                                    Strucs.Add(new Struct {index = index++,lexema = palabra,token = token, linea = this.Linea, tipo = token});
+
+                                Strucs.Add(new Struct { index = index++, lexema = palabra.Trim(),token = token, linea = this.Linea, tipo = token});
                                    /* letras.Add("" + token + " TOKEN " + palabra);
                                     program.Add(token);*/
                                 }

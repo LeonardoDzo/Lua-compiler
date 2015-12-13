@@ -11,7 +11,7 @@ namespace Ejemplo1
         List<Identificadores> _identificadoreses = new List<Identificadores>();
         Queue<Struct> queueSolucions = new Queue<Struct>();
         Stack<Struct> stackAnalisis = new Stack<Struct>();
-        Stack<int> soluciStack  = new Stack<int>();
+        Stack<Struct> soluciStack  = new Stack<Struct>();
         private static int tipo = 0;
         #endregion
 
@@ -155,7 +155,7 @@ namespace Ejemplo1
                                 queueSolucions.Enqueue(stackAnalisis.Pop());
                             }
                             AsignarValor();
-                            AsignarTipo(_idenuso, soluciStack.Pop());
+                            //AsignarTipo(_idenuso, soluciStack.Pop());
                             soluciStack.Clear();
                             _idenuso.Clear(); 
 
@@ -164,7 +164,7 @@ namespace Ejemplo1
                                  p++;
                                  
                                  Metodoexp();
-                                 if(soluciStack.Pop() > 205)
+                                 if(soluciStack.Pop().tipo > 205)
                                  if (esDo(_structs[p].token))
                                  {
                                      p++;
@@ -217,12 +217,14 @@ namespace Ejemplo1
                 else if (esIden(_structs[p].token))
                 {
                     ScheariD();
-                    _idenuso.Add(_structs[p].lexema);
+                    //_idenuso.Add(_structs[p].lexema);
+                    queueSolucions.Enqueue(_structs[p]);
                         p++;
                         if (VarList())
                         {
                             if (p < _structs.Count && esIgual(_structs[p].token))
                             {
+                                stackAnalisis.Push(_structs[p]);
                                 p++;
                                 Metodoexp();
                                 while (stackAnalisis.Count>0)
@@ -230,7 +232,12 @@ namespace Ejemplo1
                                     queueSolucions.Enqueue(stackAnalisis.Pop());
                                 }
                                 AsignarValor();
-                                AsignarTipo(_idenuso, soluciStack.Pop());
+                                //if(soluciStack.Count > 0)
+                                //{
+                                //    AsignarTipo(_idenuso, soluciStack.Pop());
+                                    
+                                //}
+                                
                                 soluciStack.Clear();
                                 _idenuso.Clear();;
                             }
@@ -260,11 +267,10 @@ namespace Ejemplo1
                                 Metodoexp();
                             }
                             
-                        } while (esComa(_structs[p].token));
-                        if (p<_structs[p].token && espaDer(_structs[p].token))
+                        } while (p < _structs.Count && esComa(_structs[p].token));
+                        if (p<_structs.Count && espaDer(_structs[p].token))
                         {
-                            p++;
-                            
+                            p++;  
                         }
                         else
                         {
@@ -324,8 +330,16 @@ namespace Ejemplo1
                 } 
                 if (p < _structs.Count && operadorBin(_structs[p].token))
                 {
-                    p++;
-                    Metodoexp();
+                    if(_structs[p].token == 120)
+                    {
+                        p++;
+                    }
+                    else
+                    {
+                        p++;
+                        Metodoexp();
+                    }
+                   
                 }
                 else
                 {
@@ -364,30 +378,7 @@ namespace Ejemplo1
                 }
                 p = aux+1;
             }
-        private void AsignarTipo(List<string> identificador, int tipo)
-        {
-            bool encontrada = false;
-            if (tipo > 0)
-            {
-                int pID = 0;
-                for (int j = 0; j < identificador.Count; j++)
-                {
-                    for (int i = 0; i < _identificadoreses.Count; i++)
-                    {
-                        if (_identificadoreses[i].lexema == identificador[j] && _identificadoreses[i].mascara == identificador[j]+_controlvar)
-                        {
-                            _identificadoreses[i].setTipo(tipo);
-                            encontrada = true;
-                        }
-                    }
-                    if (!encontrada)
-                    {
-                        _identificadoreses.Add(new Identificadores {lexema = identificador[j], tipo = tipo, mascara = identificador[j] + _controlvar});
-                        encontrada = false;
-                    }
-                }
-            }        
-        }
+  
         private void ScheariD()
         {
             bool encontrada = false;
@@ -435,7 +426,7 @@ namespace Ejemplo1
                     EsoperadorOrden(_structs[p].lexema);
                     break;
                 case ">=":
-                   EsoperadorOrden(_structs[p].lexema);
+                    EsoperadorOrden(_structs[p].lexema);
                     break;
                 case "<":
                     EsoperadorOrden(_structs[p].lexema);
@@ -452,9 +443,11 @@ namespace Ejemplo1
                 case "..":
                     EsoperadorOrden(_structs[p].lexema);
                     break;
+                case "=":
+                    stackAnalisis.Push(_structs[p]);
+                    break;
             }
         }
-
         private void EsoperadorOrden(string operador)
         {
             for (int i = 0; i < stackAnalisis.Count; i++)
@@ -466,7 +459,6 @@ namespace Ejemplo1
             }
             stackAnalisis.Push(_structs[p]);
         }
-
         protected void AccionparDerecho()
         {
             while (stackAnalisis.Count > 0 && stackAnalisis.Peek().lexema != "(")
@@ -510,7 +502,6 @@ namespace Ejemplo1
             {
                     try
                     {
-                       
                         switch (queueSolucions.Peek().lexema)
                         {
                             case "*":
@@ -546,99 +537,23 @@ namespace Ejemplo1
                             case "or":
                                 OperatorsLogic();
                                 break;
+                            case "=":
+                                OperatorsAsignacion();
+                                break;
                             default:
-                                soluciStack.Push(queueSolucions.Dequeue().tipo);
+                                soluciStack.Push(queueSolucions.Dequeue());
                                 break;
                         }
                     }
                     catch (Exception e)
                     {
-                        soluciStack.Push(-1);
+                        
                     }
                     
                 
             }
         }
-
-        public void Concatenacion()
-        {
-            queueSolucions.Dequeue();
-            int valor2 = soluciStack.Pop();
-            int valor1 = soluciStack.Pop();
-            if (valor1 == 103 && (valor2 == 103 || valor2 == 101))
-            {
-                soluciStack.Push(103);
-            }
-            else if((valor1 == 220 || valor1 == 206 || valor1 == 215 || valor1 == 103) && (valor2 == 220 || valor2 == 206 || valor2 == 215 || valor2 == 103))
-            {
-                errores.Add(_errorSemantica[3]);
-                soluciStack.Push(-1);
-            }else if (valor1 == 101 && (valor2 == 101 || valor2 == 220 || valor2 == 206 || valor2 == 215 || valor2 == 103))
-            {
-                errores.Add(_errorSemantica[2]);
-                soluciStack.Push(-1);
-            }
-            else
-            {
-                soluciStack.Push(-1);
-            }
-        }
-        public void OperatorsLogic()
-        {
-            queueSolucions.Dequeue();
-            int valor2 = soluciStack.Pop();
-            int valor1 = soluciStack.Pop();
-            if ((valor1 == 220 || valor1== 206 || valor1 == 215) && (valor2 ==220 || valor2 == 206 || valor2 == 215))
-            {
-                soluciStack.Push(220);
-            }
-            else
-            {
-                soluciStack.Push(-1);
-                errores.Add(_error[8]);
-            }
-        }
-        public void OperatorsRelacionales()
-        {
-            queueSolucions.Dequeue();
-            int valor2 = soluciStack.Pop();
-            int valor1 = soluciStack.Pop();
-            if (valor1 == 101 && valor2 == 101)
-            {
-                soluciStack.Push(220);
-            }
-            else
-            {
-                soluciStack.Push(-1);
-                errores.Add(_error[7]);
-            }
-        }
-
-        public void Operators()
-        {
-            queueSolucions.Dequeue();
-            int valor2 = soluciStack.Pop();
-            int valor1 = soluciStack.Pop();
-            if (valor1 == 101 && valor2 == 101)
-            {
-                soluciStack.Push(101);
-            }
-            else if((valor1==220 || valor1 ==206 || valor1 ==215 || valor1 == 101) && (valor2 == 220 || valor2 == 206 || valor2 == 215 || valor2 == 101))
-            {
-                errores.Add(_errorSemantica[1]);
-                soluciStack.Push(-1);
-            }else if ((valor1 == 101 || valor1 == 103) && (valor2 == 101 || valor2 == 103))
-            {
-                errores.Add(_errorSemantica[0]);
-                soluciStack.Push(-1);
-            }
-            else
-            {
-                errores.Add("Error semantica");
-                soluciStack.Push(-1);
-            }
-        }
-
+       
         #endregion   
         
         #region Busca Tokens
@@ -667,8 +582,6 @@ namespace Ejemplo1
                 return false;
             }
     }
-
-
         private bool operadorBin(int token){
             
             switch (token){
@@ -702,6 +615,7 @@ namespace Ejemplo1
                     AccionaRealizar();
                     return true;
                 case 120:
+                    AccionaRealizar();
                     return true;
                 case 121:
                     return true;
