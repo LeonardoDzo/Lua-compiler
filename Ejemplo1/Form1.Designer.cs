@@ -48,12 +48,13 @@
             this.listView2 = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.lviewVariables = new System.Windows.Forms.ListView();
             this.Tipo = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.Lex = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.Mascara = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -231,11 +232,12 @@
             this.columnHeader1,
             this.columnHeader2,
             this.columnHeader3,
-            this.columnHeader4});
+            this.columnHeader4,
+            this.columnHeader5});
             this.listView2.Dock = System.Windows.Forms.DockStyle.Right;
-            this.listView2.Location = new System.Drawing.Point(576, 0);
+            this.listView2.Location = new System.Drawing.Point(408, 0);
             this.listView2.Name = "listView2";
-            this.listView2.Size = new System.Drawing.Size(171, 153);
+            this.listView2.Size = new System.Drawing.Size(443, 153);
             this.listView2.TabIndex = 10;
             this.listView2.UseCompatibleStateImageBehavior = false;
             this.listView2.View = System.Windows.Forms.View.Details;
@@ -251,6 +253,16 @@
             this.columnHeader2.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.columnHeader2.Width = 38;
             // 
+            // columnHeader3
+            // 
+            this.columnHeader3.Text = "OP2";
+            this.columnHeader3.Width = 33;
+            // 
+            // columnHeader4
+            // 
+            this.columnHeader4.Text = "Resultado";
+            this.columnHeader4.Width = 67;
+            // 
             // lviewVariables
             // 
             this.lviewVariables.Alignment = System.Windows.Forms.ListViewAlignment.SnapToGrid;
@@ -260,9 +272,9 @@
             this.Lex,
             this.Mascara});
             this.lviewVariables.Dock = System.Windows.Forms.DockStyle.Right;
-            this.lviewVariables.Location = new System.Drawing.Point(747, 0);
+            this.lviewVariables.Location = new System.Drawing.Point(851, 0);
             this.lviewVariables.Name = "lviewVariables";
-            this.lviewVariables.Size = new System.Drawing.Size(178, 153);
+            this.lviewVariables.Size = new System.Drawing.Size(74, 153);
             this.lviewVariables.TabIndex = 9;
             this.lviewVariables.UseCompatibleStateImageBehavior = false;
             this.lviewVariables.View = System.Windows.Forms.View.Details;
@@ -279,14 +291,9 @@
             // 
             this.Mascara.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // columnHeader3
+            // columnHeader5
             // 
-            this.columnHeader3.Text = "OP2";
-            this.columnHeader3.Width = 33;
-            // 
-            // columnHeader4
-            // 
-            this.columnHeader4.Text = "Resultado";
+            this.columnHeader5.Text = "Apuntador";
             // 
             // CompiladorLua
             // 
@@ -344,6 +351,7 @@
         private System.Windows.Forms.ColumnHeader columnHeader2;
         private System.Windows.Forms.ColumnHeader columnHeader3;
         private System.Windows.Forms.ColumnHeader columnHeader4;
+        private System.Windows.Forms.ColumnHeader columnHeader5;
     }
 }
 

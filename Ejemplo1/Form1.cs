@@ -136,7 +136,7 @@ namespace Ejemplo1
             lviewVariables.Columns.Add("Tipo");
             lviewVariables.Columns.Add("Lex");
             lviewVariables.Columns.Add("Mascara");
-            string[] sitem = new String[4];
+            string[] sitem = new String[5];
             ListViewItem lvi1;
             foreach (var item in sx.Identificadoreses)
             {
@@ -154,12 +154,14 @@ namespace Ejemplo1
             listView2.Columns.Add("OP1");
             listView2.Columns.Add("Op2");
             listView2.Columns.Add("R");
+            listView2.Columns.Add("Apuntador");
             foreach (var item in sx.Polish)
             {
                 sitem[0] = item.operador;
                 sitem[1] = item.operador1;
                 sitem[2] = item.operador2;
                 sitem[3] = item.resultado;
+                sitem[4] = item.apuntador;
                 lvi1 = new ListViewItem(sitem);
                 listView2.Items.Add(lvi1);
 
@@ -169,6 +171,12 @@ namespace Ejemplo1
             foreach (var item in sx.Errores())
             {
                 lbxErrores.Items.Add(item);
+            }
+            GeneradorCodigoObjeto go = new GeneradorCodigoObjeto();
+            go.main();
+            if(lbxErrores.Text == null)
+            {
+                go.main();
             }
             MessageBox.Show("Compilacin terminada");
         }

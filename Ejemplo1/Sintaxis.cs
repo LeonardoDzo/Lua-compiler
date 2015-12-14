@@ -8,7 +8,8 @@ namespace Ejemplo1
     class Sintaxis
     {
         #region Encontrar Valor
-        int contadorIF = 0;
+        int contadorIF = -1;
+        bool activaoElse = false;
         int contador = 0;
         ObjPolish ob = new ObjPolish();
         public static List<ObjPolish> _polish = new List<ObjPolish>();
@@ -92,6 +93,7 @@ namespace Ejemplo1
             {
                 if (esIf(_structs[p].token))
                 {
+                    contadorIF++;
                     p++;
                     if (Metodoexp())
                     {
@@ -101,8 +103,12 @@ namespace Ejemplo1
                         }
                         AsignarValor();
                         soluciStack.Clear();
-                        
-
+                        _polish.Add(new ObjPolish
+                        {
+                            operador = "BRF",
+                            resultado = "Q" + contadorIF,
+                            operador1 = "T"+contador
+                        });
                         if (p < _structs.Count && esThen(_structs[p].token))
                         {
                             p++;
@@ -115,15 +121,22 @@ namespace Ejemplo1
                             }
                             if (p < _structs.Count && esElse(_structs[p].token))
                             {
+
                                 activaelse = true;
-                                
+                                contadorIF--;
+                                if (contadorIF < 0) contadorIF++;
+                                _polish.Add(new ObjPolish
+                                {
+                                    operador = "BRI",
+                                    resultado = "Q" + contadorIF
+                                });
+                                BusquedaQ("Q" + contadorIF);
                                 p++;
                                 if (p < _structs.Count && !esEnd(_structs[p].token))
                                 {
                                     do
                                     {
                                         Sentencia();
-                                        contadorIF++;
                                     } while (p < _structs.Count && !esEnd(_structs[p].token));
                                 }
                                 
@@ -133,6 +146,10 @@ namespace Ejemplo1
                             {
                                 if (p < _structs.Count && esEnd(_structs[p].token))
                                 {
+                                    _polish.Add(new ObjPolish
+                                    {
+                                        apuntador = "Q" + contadorIF
+                                    });
                                     break;
                                 }
                                 else 
@@ -310,7 +327,21 @@ namespace Ejemplo1
                 }
             }      
         }
-    
+
+        private void BusquedaQ(string v)
+        {
+            for (int i = 0; i < _polish.Count; i++)
+            {
+                if (_polish[i].resultado == v)
+                {
+                    _polish[i].operador = "BRF";
+                    _polish[i].operador1 = _polish[i - 1].resultado;
+                    _polish[i].resultado = "P" + contadorIF;
+                    break;
+                }
+            }
+       }
+
         public bool VarList()
         {
             bool h=true;
@@ -456,6 +487,9 @@ namespace Ejemplo1
                 case "<=":
                     EsoperadorOrden(_structs[p].lexema);
                     break;
+                case "==":
+                    EsoperadorOrden(_structs[p].lexema);
+                    break;
                 case "and":
                     EsoperadorOrden(_structs[p].lexema);
                     break;
@@ -516,13 +550,10 @@ namespace Ejemplo1
         bool asignacion = false;
         private void AsignarValor()
         {
-            
-
             while (queueSolucions.Count >0)
             {
                     try
                     {
-
                         switch (queueSolucions.Peek().lexema)
                         {
                             case "*":
@@ -541,19 +572,19 @@ namespace Ejemplo1
                                 Concatenacion();
                                 break;
                             case ">":
-                                OperatorsRelacionales();
+                                OperatorsRelacionales(">");
                                 break;
                             case ">=":
-                                OperatorsRelacionales();
+                                OperatorsRelacionales(">=");
                                 break;
                             case "<":
-                                OperatorsRelacionales();
+                                OperatorsRelacionales("<");
                                 break;
                             case "<=":
-                                OperatorsRelacionales();
+                                OperatorsRelacionales("<=");
                                 break;
                             case "==":
-                                OperatorsRelacionales();
+                                OperatorsRelacionales("==");
                                 break;
                             case "and":
                                 OperatorsLogic();
@@ -595,22 +626,53 @@ namespace Ejemplo1
             var valor1 = soluciStack.Pop();
             if (asignacion)
             {
-                _polish.Add(new ObjPolish
+                if (activaelse)
                 {
-                    operador = "=",
-                    operador1 = "T"+contador,
-                    resultado = valor1.lexema
-                });
+                    _polish.Add(new ObjPolish
+                    {
+                        operador = "=",
+                        operador1 = "T" + contador,
+                        resultado = valor1.lexema,
+                        apuntador = "P"+contadorIF
+                    });
+                    activaelse = false;
+                }
+                else
+                {
+                    _polish.Add(new ObjPolish
+                    {
+                        operador = "=",
+                        operador1 = "T" + contador,
+                        resultado = valor1.lexema
+                    });
+                }
+                
                 asignacion = false;
             }
             else
             {
-                _polish.Add(new ObjPolish
+                if (activaelse)
                 {
-                    operador = "=",
-                    operador1 = valor2.lexema,
-                    resultado = valor1.lexema
-                });
+                    _polish.Add(new ObjPolish
+                    {
+                        operador = "=",
+                        operador1 = valor2.lexema,
+                        resultado = valor1.lexema,
+                        apuntador = "P"+contadorIF
+                    });
+                    activaelse = false;
+                }
+                else
+                {
+                    _polish.Add(new ObjPolish
+                    {
+                        operador = "=",
+                        operador1 = valor2.lexema,
+                        resultado = valor1.lexema
+                    });
+
+                }
+                
             }
             for (int i = 0; i < _identificadoreses.Count; i++)
             {
@@ -626,15 +688,24 @@ namespace Ejemplo1
             }
         }
 
-        private void OperatorsRelacionales()
+        private void OperatorsRelacionales(string op)
         {
             queueSolucions.Dequeue();
 
             var valor2 = soluciStack.Pop();
             var valor1 = soluciStack.Pop();
 
-            if ((valor1.tipo == 116 || valor1.tipo == 117 || valor1.tipo == 118 || valor1.tipo == 119 || valor1.tipo == 121) && (valor2.tipo == 116 || valor2.tipo == 117 || valor2.tipo == 118 || valor2.tipo == 119 || valor2.tipo == 121))
+            if ((valor1.tipo == 101 ) && (valor2.tipo == 101))
             {
+                contador++;
+                _polish.Add(new ObjPolish
+                {
+                    operador = op,
+                    operador1 = valor1.lexema,
+                    operador2 = valor2.lexema,
+                    resultado = "T" + contador,
+                });
+                valor1.lexema = "T" + contador;
                 soluciStack.Push(valor1);
             }
             else
@@ -687,13 +758,29 @@ namespace Ejemplo1
             if (valor1.tipo ==101 && valor2.tipo == 101)
             {
                 contador++;
-                _polish.Add(new ObjPolish
+                if (activaelse)
                 {
-                    operador = op,
-                    operador1 = valor1.lexema,
-                    operador2 = valor2.lexema,
-                    resultado = "T" + contador,
-                });
+                    _polish.Add(new ObjPolish
+                    {
+                        operador = op,
+                        operador1 = valor1.lexema,
+                        operador2 = valor2.lexema,
+                        resultado = "T" + contador,
+                        apuntador = "P"+ contadorIF
+                    });
+                    activaelse = false;
+                }
+                else
+                {
+                    _polish.Add(new ObjPolish
+                    {
+                        operador = op,
+                        operador1 = valor1.lexema,
+                        operador2 = valor2.lexema,
+                        resultado = "T" + contador,
+                    });
+                }
+                
                 asignacion = true;
                 valor1.lexema = "T" + contador;
                 soluciStack.Push(valor1);
@@ -768,6 +855,7 @@ namespace Ejemplo1
                     AccionaRealizar();
                     return true;
                 case 121:
+                    AccionaRealizar();
                     return true;
                 case 122:
                     return true;
